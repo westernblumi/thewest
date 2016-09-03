@@ -1,4 +1,4 @@
 var scriptUpdate={
-	TWFKT:'0.2',
-	TWFKTNew:'New Release',
+	TWFBT:'0.2',
+	TWFBTNew:'First Release',
 };
