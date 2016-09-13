@@ -1,4 +1,4 @@
 var scriptUpdate={
-	TWFBT:'0.4',
-	TWFBTNew:'Added calculation for all character classes and character premium (soldier)',
+	TWFBT:'0.5',
+	TWFBTNew:'New fort battle formula added, Spanish added (Thanks pepe100)',
 };
