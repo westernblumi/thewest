@@ -1,4 +1,4 @@
 var scriptUpdate={
-	TWFBT:'0.51',
+	TWFBT:'0.52',
 	TWFBTNew:'Small bug fix',
 };
