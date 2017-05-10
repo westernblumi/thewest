@@ -3,6 +3,6 @@ var scriptUpdate={
 	TWFBTNew:'Small bug fix',
 	announcementBlock: '1.02',
 	announcementBlockNew: 'Support for other language servers',
-	WTK:'1.00',
-	WTKNew:'Release',
+	WTK:'1.01',
+	WTKNew:'Small bug fixes',
 };
