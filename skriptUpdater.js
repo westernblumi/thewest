@@ -4,5 +4,5 @@ var scriptUpdate={
 	announcementBlock: '1.02',
 	announcementBlockNew: 'Support for other language servers',
 	WTK: '1.04',
-	WTKNew:' Bug fixes',
+	WTKNew: 'Bug fixes',
 };
