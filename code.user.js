@@ -352,15 +352,6 @@
                 TWFBT.characterClass = val;
             });
 
-            var formulaBox = new west.gui.Combobox();
-            formulaBox.addItem('newFormula', TWFBTlang.newFormula);
-            formulaBox.addItem('oldFormula', TWFBTlang.oldFormula);
-            formulaBox.select('newFormula');
-            TWFBT.formula = 'newFormula';
-            formulaBox.addListener(function(val) {
-                TWFBT.formula = val;
-            });
-
             var modeBox = new west.gui.Combobox();
             modeBox.addItem('attack', TWFBTlang.attack);
             modeBox.addItem('defense', TWFBTlang.defense);
@@ -373,7 +364,6 @@
             featScroll.appendContent(paCheckbox.getMainDiv());
             featScroll.appendContent(' ');
             featScroll.appendContent(charClassBox.getMainDiv());
-            featScroll.appendContent(formulaBox.getMainDiv());
             featScroll.appendContent('<br>');
             featScroll.appendContent(calcButton.getMainDiv());
             featScroll.appendContent(clearButton.getMainDiv());
@@ -448,8 +438,8 @@
                 TWFBT.Calculator.values.lifepoints = 0;
 
                 TWFBT.Calculator.newValues = {
-                    offense: 55.444444,
-                    defense: 55.444444,
+                    offense: 0,
+                    defense: 0,
                     offense_skillwithbonus: 0,
                     defense_skillwithbonus: 0,
                     offense_defaultbonus: 25,
@@ -463,52 +453,18 @@
                     lifepoints: 0,
                 };
 
-                var wear = [];
                 var number_database = [];
                 var name_database = [];
 
 
 
 
-                var soldierBonus = 1;
-                if (TWFBT.pa && TWFBT.characterClass == 'soldier') {
-                    soldierBonus = 1.5;
-                } else if (TWFBT.characterClass == 'soldier') {
-                    soldierBonus = 1.25;
-                }
+                var side_skill = getSideSkill(TWFBT.side);
+                var soldierBonus = getSoldierBonus(TWFBT.pa, TWFBT.characterClass);
 
                 //add skillbonus (with clothes)
-                var side = TWFBT.side;
-                var formula = TWFBT.formula;
-                if (formula == 'oldFormula') {
-                    if (side == 'attack') {
-                        var side_skill = 'endurance';
-                    } else {
-                        var side_skill = 'hide';
-                    }
-                    TWFBT.Calculator.values.defense_skillwithbonus = Math.pow(CharacterSkills.getSkill(side_skill).getPointsWithBonus(), 0.6) +
-                        Math.pow(CharacterSkills.getSkill('dodge').getPointsWithBonus(), 0.4) +
-                        Math.pow(CharacterSkills.getSkill('leadership').getPointsWithBonus() * soldierBonus, 0.5);
-                    TWFBT.Calculator.values.defense += TWFBT.Calculator.values.defense_skillwithbonus;
-                    TWFBT.Calculator.values.offense_skillwithbonus = Math.pow(CharacterSkills.getSkill(side_skill).getPointsWithBonus(), 0.6) +
-                        Math.pow(CharacterSkills.getSkill('aim').getPointsWithBonus(), 0.4) +
-                        Math.pow(CharacterSkills.getSkill('leadership').getPointsWithBonus() * soldierBonus, 0.5);
-                    TWFBT.Calculator.values.offense += TWFBT.Calculator.values.offense_skillwithbonus;
-                } else {
-                    if (side == 'attack') {
-                        var side_skill = 'hide';
-                    } else {
-                        var side_skill = 'pitfall';
-                    }
-                    TWFBT.Calculator.values.defense_skillwithbonus = Math.pow(CharacterSkills.getSkill(side_skill).getPointsWithBonus(), 0.6) +
-                        Math.pow(CharacterSkills.getSkill('dodge').getPointsWithBonus(), 0.5) +
-                        Math.pow(CharacterSkills.getSkill('leadership').getPointsWithBonus() * soldierBonus, 0.5);
-                    TWFBT.Calculator.values.defense += TWFBT.Calculator.values.defense_skillwithbonus;
-                    TWFBT.Calculator.values.offense_skillwithbonus = Math.pow(CharacterSkills.getSkill(side_skill).getPointsWithBonus(), 0.6) +
-                        Math.pow(CharacterSkills.getSkill('aim').getPointsWithBonus(), 0.5) +
-                        Math.pow(CharacterSkills.getSkill('leadership').getPointsWithBonus() * soldierBonus, 0.5);
-                    TWFBT.Calculator.values.offense += TWFBT.Calculator.values.offense_skillwithbonus;
-                }
+                calcSkillWithBonus(side_skill, soldierBonus);
+
 
                 //add defaultbonus
                 TWFBT.Calculator.values.defense += TWFBT.Calculator.values.defense_defaultbonus;
@@ -578,7 +534,9 @@
                 TWFBT.Calculator.values.offense += TWFBT.Calculator.values.offense_setbonus;
                 TWFBT.Calculator.values.defense += TWFBT.Calculator.values.defense_setbonus
 
-                addWorkerBonus();
+                var workerBonus = getWorkerBonus(TWFBT.pa, TWFBT.characterClass);
+                TWFBT.Calculator.values.offense *= workerBonus;
+                TWFBT.Calculator.values.defense *= workerBonus;
                 prettifyResults();
 
                 TWFBT.Calculator.values.lifepoints = Character.maxHealth;
@@ -588,22 +546,50 @@
 
             }
 
-            var addWorkerBonus = function() {
-                //calc new worker bonus
+
+            var getSideSkill = function(side) {
+                if (side == 'attack') {
+                    return 'hide';
+                } else {
+                    return 'pitfall';
+                }
+            }
+
+            var calcSkillWithBonus = function(side_skill, soldierBonus) {
+                TWFBT.Calculator.values.defense_skillwithbonus = Math.pow(CharacterSkills.getSkill(side_skill).getPointsWithBonus(), 0.6) +
+                    Math.pow(CharacterSkills.getSkill('dodge').getPointsWithBonus(), 0.5) +
+                    Math.pow(CharacterSkills.getSkill('leadership').getPointsWithBonus() * soldierBonus, 0.5);
+                TWFBT.Calculator.values.defense += TWFBT.Calculator.values.defense_skillwithbonus;
+                TWFBT.Calculator.values.offense_skillwithbonus = Math.pow(CharacterSkills.getSkill(side_skill).getPointsWithBonus(), 0.6) +
+                    Math.pow(CharacterSkills.getSkill('aim').getPointsWithBonus(), 0.5) +
+                    Math.pow(CharacterSkills.getSkill('leadership').getPointsWithBonus() * soldierBonus, 0.5);
+                TWFBT.Calculator.values.offense += TWFBT.Calculator.values.offense_skillwithbonus;
+
+            }
+
+            var getSoldierBonus = function(pa, characterClass) {
+                var soldierBonus = 1;
+                if (pa && characterClass == 'soldier') {
+                    soldierBonus = 1.5;
+                } else if (characterClass == 'soldier') {
+                    soldierBonus = 1.25;
+                }
+                return soldierBonus;
+            }
+
+            var getWorkerBonus = function(pa, characterClass) {
                 var workerBonus = 1;
-                if (TWFBT.pa && TWFBT.characterClass == 'worker') {
+                if (pa && characterClass == 'worker') {
                     workerBonus = 1.4;
-                } else if (TWFBT.characterClass == 'worker') {
+                } else if (characterClass == 'worker') {
                     workerBonus = 1.2;
                 }
-                TWFBT.Calculator.values.offense *= workerBonus;
-                TWFBT.Calculator.values.defense *= workerBonus;
+                return workerBonus;
             }
 
             var prettifyResults = function() {
                 for (var value in TWFBT.Calculator.newValues) {
                     if (TWFBT.Calculator.newValues.hasOwnProperty(value)) {
-
                         TWFBT.Calculator.newValues[value] = Math.round(TWFBT.Calculator.newValues[value] * 100) / 100;
                     }
                 }
