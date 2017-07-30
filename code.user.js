@@ -453,10 +453,9 @@
                     lifepoints: 0,
                 };
 
-                var number_database = [];
-                var name_database = [];
 
 
+                var sets = {};
 
 
                 var side_skill = getSideSkill(TWFBT.side);
@@ -471,7 +470,42 @@
                 TWFBT.Calculator.values.offense += TWFBT.Calculator.values.offense_defaultbonus;
 
 
-                var items = ['animal', 'belt', 'body', 'foot', 'head', 'left_arm', 'neck', 'pants', 'right_arm', 'yield'];
+
+                for (item in Wear.wear) {
+                    if (Wear.wear.hasOwnProperty(item)) {
+                        var item_obj = Wear.wear[item].obj;
+                        TWFBT.Calculator.values.defense_fortbattlebonus += item_obj.bonus.fortbattle.defense;
+                        TWFBT.Calculator.values.defense_fortbattlebonus += item_obj.bonus.fortbattlesector.defense;
+                        TWFBT.Calculator.values.offense_fortbattlebonus += item_obj.bonus.fortbattle.offense;
+                        TWFBT.Calculator.values.offense_fortbattlebonus += item_obj.bonus.fortbattlesector.offense;
+                        TWFBT.Calculator.values.damage += item_obj.bonus.fortbattlesector.damage;
+                        TWFBT.Calculator.values.resistance += item_obj.bonus.fortbattle.resistance;
+
+                        for (j = 0; j < item_obj.bonus.item.length; j++) {
+                            switch (item_obj.bonus.item[j].name) {
+                                case 'offense':
+                                    TWFBT.Calculator.values.offense_fortbattlebonus += item_obj.bonus.item[j].value;
+                                    break;
+                                case 'defense':
+                                    TWFBT.Calculator.values.defense_fortbattlebonus += item_obj.bonus.item[j].value;
+                                    break;
+                                case 'damage':
+                                    TWFBT.Calculator.values.damage += item_obj.bonus.item[j].value;
+                                    break;
+                            }
+                        }
+
+                        if (item_obj.set != null) {
+                            if (sets[item_obj.set] == undefined) {
+                                sets[item_obj.set] = 1;
+                            } else {
+                                sets[item_obj.set] += 1;
+                            }
+                        }
+
+                    }
+                }
+                /*var items = ['animal', 'belt', 'body', 'foot', 'head', 'left_arm', 'neck', 'pants', 'right_arm', 'yield'];
                 for (i = 0; i < items.length; i++) {
                     try {
                         //Get fortbattle and fortbattlesector bonuses of the current equipment
@@ -507,30 +541,30 @@
                         var item_id = Wear.get(items[i]).obj.item_id;
                         var item_obj = ItemManager.get(item_id);
                         if (item_obj.set != null) {
-                            if (number_database[item_obj.set] == undefined) {
-                                number_database[item_obj.set] = 1;
-                                name_database.push(item_obj.set);
+                            if (sets[item_obj.set] == undefined) {
+                                sets[item_obj.set] = 1;
                             } else {
-                                number_database[item_obj.set] = number_database[item_obj.set] + 1;
+                                sets[item_obj.set] += 1;
                             }
                         }
                     } catch (e) {}
-                }
+                }*/
                 TWFBT.Calculator.values.offense += TWFBT.Calculator.values.offense_fortbattlebonus;
                 TWFBT.Calculator.values.defense += TWFBT.Calculator.values.defense_fortbattlebonus;
 
+                TWFBT.Calculator.Test = sets;
 
-                for (var i = 0; i < name_database.length; i++) {
-                    var obj = west.storage.ItemSetManager.get(name_database[i]);
-                    var key = name_database[i];
-                    var stage = number_database[key];
-                    var setbonusArray = [0, 0, 0, 0];
-                    setbonusArray = update(key, stage);
-                    TWFBT.Calculator.values.offense_setbonus += setbonusArray[0];
-                    TWFBT.Calculator.values.defense_setbonus += setbonusArray[1];
-                    TWFBT.Calculator.values.damage += setbonusArray[2];
-                    TWFBT.Calculator.values.resistance += setbonusArray[3];
+                for (var set in sets) {
+                    if (sets.hasOwnProperty(set)) {
+                        var setbonusArray = [0, 0, 0, 0];
+                        setbonusArray = update(set, sets[set]);
+                        TWFBT.Calculator.values.offense_setbonus += setbonusArray[0];
+                        TWFBT.Calculator.values.defense_setbonus += setbonusArray[1];
+                        TWFBT.Calculator.values.damage += setbonusArray[2];
+                        TWFBT.Calculator.values.resistance += setbonusArray[3];
+                    }
                 }
+
                 TWFBT.Calculator.values.offense += TWFBT.Calculator.values.offense_setbonus;
                 TWFBT.Calculator.values.defense += TWFBT.Calculator.values.defense_setbonus
 
