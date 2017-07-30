@@ -337,6 +337,7 @@
             });
 
             var paCheckbox = new west.gui.Checkbox().setLabel(TWFBTlang.pa).setSelected(Premium.hasBonus('character'));
+            TWFBT.pa = Premium.hasBonus('character');
             paCheckbox.setCallback(function() {
                 TWFBT.pa = paCheckbox.isSelected();
             }.bind(this));
@@ -377,9 +378,11 @@
     };
 
     TWFBT.Calculator = {
-
         init: function() {
 
+        },
+
+        resetValues: function() {
             TWFBT.Calculator.values = {
                 offense: 0,
                 defense: 0,
@@ -393,371 +396,247 @@
                 defense_setbonus: 0,
                 damage: 0,
                 resistance: 0,
+                resistanceSkill: 0,
                 lifepoints: 0,
-                side_skill: 'endurance'
             };
+        },
 
-            var update = function(set, stage) {
+        calcSkills: function() {
+            this.resetValues();
+            var side_skill = this.getSideSkill(TWFBT.side);
+            var soldierBonus = this.getSoldierBonus(TWFBT.pa, TWFBT.characterClass);
+            this.calcSkillWithBonus(side_skill, soldierBonus);
+            this.calcClothBonus();
+            TWFBT.Calculator.values.lifepoints = Character.maxHealth;
+            TWFBT.Calculator.values.resistanceSkill = Math.round(300 * CharacterSkills.getSkill(side_skill).getPointsWithBonus() / Character.maxHealth);
+            this.addBonusesTogether();
+            var workerBonus = this.getWorkerBonus(TWFBT.pa, TWFBT.characterClass);
+            TWFBT.Calculator.values.offense *= workerBonus;
+            TWFBT.Calculator.values.defense *= workerBonus;
 
-                var bonusResultArray = {
-                    offense: 0,
-                    defense: 0,
-                    damage: 0,
-                    resistance: 0
-                };
-                var bonuses = west.storage.ItemSetManager._setList[set].getMergedStages(stage);
+            this.prettifyResults();
 
-                for (var i = 0; i < bonuses.length; i++) {
-                    if (bonuses[i].key == 'level') {
-                        if (bonuses[i].bonus.name == 'damage') {
-                            bonusResultArray['damage'] += bonuses[i].bonus.value * Character.level;
+            window.setTimeout(function() {
+                TWFBT.Calculator.showData(side_skill);
+            }, 1000);
+
+        },
+
+        calcClothBonus: function() {
+            var sets = {};
+            for (item in Wear.wear) {
+                if (Wear.wear.hasOwnProperty(item)) {
+                    var item_obj = Wear.wear[item].obj;
+                    TWFBT.Calculator.values.defense_fortbattlebonus += item_obj.bonus.fortbattle.defense;
+                    TWFBT.Calculator.values.defense_fortbattlebonus += item_obj.bonus.fortbattlesector.defense;
+                    TWFBT.Calculator.values.offense_fortbattlebonus += item_obj.bonus.fortbattle.offense;
+                    TWFBT.Calculator.values.offense_fortbattlebonus += item_obj.bonus.fortbattlesector.offense;
+                    TWFBT.Calculator.values.damage += item_obj.bonus.fortbattlesector.damage;
+                    TWFBT.Calculator.values.resistance += item_obj.bonus.fortbattle.resistance;
+
+                    for (j = 0; j < item_obj.bonus.item.length; j++) {
+                        switch (item_obj.bonus.item[j].name) {
+                            case 'offense':
+                                TWFBT.Calculator.values.offense_fortbattlebonus += item_obj.bonus.item[j].value;
+                                break;
+                            case 'defense':
+                                TWFBT.Calculator.values.defense_fortbattlebonus += item_obj.bonus.item[j].value;
+                                break;
+                            case 'damage':
+                                TWFBT.Calculator.values.damage += item_obj.bonus.item[j].value;
+                                break;
+                        }
+                    }
+                    //Collect all set information
+                    if (item_obj.set != null) {
+                        if (sets[item_obj.set] == undefined) {
+                            sets[item_obj.set] = 1;
                         } else {
-                            bonusResultArray[bonuses[i].name] += bonuses[i].bonus.value * Character.level;
+                            sets[item_obj.set] += 1;
                         }
+                    }
+                }
+            }
+
+            //Calc set bonus
+            for (var set in sets) {
+                if (sets.hasOwnProperty(set)) {
+                    var setbonusArray = [0, 0, 0, 0];
+                    setbonusArray = this.getSetBonus(set, sets[set]);
+                    TWFBT.Calculator.values.offense_setbonus += setbonusArray[0];
+                    TWFBT.Calculator.values.defense_setbonus += setbonusArray[1];
+                    TWFBT.Calculator.values.damage += setbonusArray[2];
+                    TWFBT.Calculator.values.resistance += setbonusArray[3];
+                }
+            }
+        },
+
+        getSetBonus: function(set, quantity) {
+            var bonusResultArray = {
+                offense: 0,
+                defense: 0,
+                damage: 0,
+                resistance: 0
+            };
+            var bonuses = west.storage.ItemSetManager._setList[set].getMergedStages(quantity);
+
+            for (var i = 0; i < bonuses.length; i++) {
+                if (bonuses[i].key == 'level') {
+                    if (bonuses[i].bonus.name == 'damage') {
+                        bonusResultArray['damage'] += bonuses[i].bonus.value * Character.level;
                     } else {
-                        bonusResultArray[bonuses[i].name] += bonuses[i].value;
+                        bonusResultArray[bonuses[i].name] += bonuses[i].bonus.value * Character.level;
                     }
-                }
-
-                return [bonusResultArray['offense'], bonusResultArray['defense'], bonusResultArray['damage'], bonusResultArray['resistance']];
-            }
-
-            TWFBT.Calculator.calcSkills = function() {
-                TWFBT.Calculator.values.offense = 0;
-                TWFBT.Calculator.values.defense = 0;
-                TWFBT.Calculator.values.offense_skillwithbonus = 0;
-                TWFBT.Calculator.values.defense_skillwithbonus = 0;
-                TWFBT.Calculator.values.offense_defaultbonus = 25;
-                TWFBT.Calculator.values.defense_defaultbonus = 10;
-                TWFBT.Calculator.values.offense_fortbattlebonus = 0;
-                TWFBT.Calculator.values.defense_fortbattlebonus = 0;
-                TWFBT.Calculator.values.offense_setbonus = 0;
-                TWFBT.Calculator.values.defense_setbonus = 0;
-                TWFBT.Calculator.values.damage = 0;
-                TWFBT.Calculator.values.resistance = 0;
-                TWFBT.Calculator.values.lifepoints = 0;
-
-                TWFBT.Calculator.newValues = {
-                    offense: 0,
-                    defense: 0,
-                    offense_skillwithbonus: 0,
-                    defense_skillwithbonus: 0,
-                    offense_defaultbonus: 25,
-                    defense_defaultbonus: 10,
-                    offense_fortbattlebonus: 0,
-                    defense_fortbattlebonus: 0,
-                    offense_setbonus: 0,
-                    defense_setbonus: 0,
-                    damage: 0,
-                    resistance: 0,
-                    lifepoints: 0,
-                };
-
-
-
-                var sets = {};
-
-
-                var side_skill = getSideSkill(TWFBT.side);
-                var soldierBonus = getSoldierBonus(TWFBT.pa, TWFBT.characterClass);
-
-                //add skillbonus (with clothes)
-                calcSkillWithBonus(side_skill, soldierBonus);
-
-
-                //add defaultbonus
-                TWFBT.Calculator.values.defense += TWFBT.Calculator.values.defense_defaultbonus;
-                TWFBT.Calculator.values.offense += TWFBT.Calculator.values.offense_defaultbonus;
-
-
-
-                for (item in Wear.wear) {
-                    if (Wear.wear.hasOwnProperty(item)) {
-                        var item_obj = Wear.wear[item].obj;
-                        TWFBT.Calculator.values.defense_fortbattlebonus += item_obj.bonus.fortbattle.defense;
-                        TWFBT.Calculator.values.defense_fortbattlebonus += item_obj.bonus.fortbattlesector.defense;
-                        TWFBT.Calculator.values.offense_fortbattlebonus += item_obj.bonus.fortbattle.offense;
-                        TWFBT.Calculator.values.offense_fortbattlebonus += item_obj.bonus.fortbattlesector.offense;
-                        TWFBT.Calculator.values.damage += item_obj.bonus.fortbattlesector.damage;
-                        TWFBT.Calculator.values.resistance += item_obj.bonus.fortbattle.resistance;
-
-                        for (j = 0; j < item_obj.bonus.item.length; j++) {
-                            switch (item_obj.bonus.item[j].name) {
-                                case 'offense':
-                                    TWFBT.Calculator.values.offense_fortbattlebonus += item_obj.bonus.item[j].value;
-                                    break;
-                                case 'defense':
-                                    TWFBT.Calculator.values.defense_fortbattlebonus += item_obj.bonus.item[j].value;
-                                    break;
-                                case 'damage':
-                                    TWFBT.Calculator.values.damage += item_obj.bonus.item[j].value;
-                                    break;
-                            }
-                        }
-
-                        if (item_obj.set != null) {
-                            if (sets[item_obj.set] == undefined) {
-                                sets[item_obj.set] = 1;
-                            } else {
-                                sets[item_obj.set] += 1;
-                            }
-                        }
-
-                    }
-                }
-                /*var items = ['animal', 'belt', 'body', 'foot', 'head', 'left_arm', 'neck', 'pants', 'right_arm', 'yield'];
-                for (i = 0; i < items.length; i++) {
-                    try {
-                        //Get fortbattle and fortbattlesector bonuses of the current equipment
-                        var item_obj = ItemManager.get(Wear.get(items[i]).obj.item_id);
-                        TWFBT.Calculator.values.defense_fortbattlebonus += item_obj.bonus.fortbattle.defense;
-                        TWFBT.Calculator.values.defense_fortbattlebonus += item_obj.bonus.fortbattlesector.defense;
-                        TWFBT.Calculator.values.offense_fortbattlebonus += item_obj.bonus.fortbattle.offense;
-                        TWFBT.Calculator.values.offense_fortbattlebonus += item_obj.bonus.fortbattlesector.offense;
-                        TWFBT.Calculator.values.damage += item_obj.bonus.fortbattlesector.damage;
-                        TWFBT.Calculator.values.resistance += item_obj.bonus.fortbattle.resistance;
-
-                        for (j = 0; j < item_obj.bonus.item.length; j++) {
-                            try {
-                                if (item_obj.bonus.item[j].name == 'offense') {
-                                    TWFBT.Calculator.values.offense_fortbattlebonus += item_obj.bonus.item[j].value;
-                                }
-                            } catch (e) {}
-
-                            try {
-                                if (item_obj.bonus.item[j].name == 'defense') {
-                                    TWFBT.Calculator.values.defense_fortbattlebonus += item_obj.bonus.item[j].value;
-                                }
-                            } catch (e) {}
-
-                            try {
-                                if (item_obj.bonus.item[j].type == 'damage') {
-                                    TWFBT.Calculator.values.damage += item_obj.bonus.item[j].value;
-                                }
-                            } catch (e) {}
-                        }
-
-                        //Get set bonuses of the current equipment
-                        var item_id = Wear.get(items[i]).obj.item_id;
-                        var item_obj = ItemManager.get(item_id);
-                        if (item_obj.set != null) {
-                            if (sets[item_obj.set] == undefined) {
-                                sets[item_obj.set] = 1;
-                            } else {
-                                sets[item_obj.set] += 1;
-                            }
-                        }
-                    } catch (e) {}
-                }*/
-                TWFBT.Calculator.values.offense += TWFBT.Calculator.values.offense_fortbattlebonus;
-                TWFBT.Calculator.values.defense += TWFBT.Calculator.values.defense_fortbattlebonus;
-
-                TWFBT.Calculator.Test = sets;
-
-                for (var set in sets) {
-                    if (sets.hasOwnProperty(set)) {
-                        var setbonusArray = [0, 0, 0, 0];
-                        setbonusArray = update(set, sets[set]);
-                        TWFBT.Calculator.values.offense_setbonus += setbonusArray[0];
-                        TWFBT.Calculator.values.defense_setbonus += setbonusArray[1];
-                        TWFBT.Calculator.values.damage += setbonusArray[2];
-                        TWFBT.Calculator.values.resistance += setbonusArray[3];
-                    }
-                }
-
-                TWFBT.Calculator.values.offense += TWFBT.Calculator.values.offense_setbonus;
-                TWFBT.Calculator.values.defense += TWFBT.Calculator.values.defense_setbonus
-
-                var workerBonus = getWorkerBonus(TWFBT.pa, TWFBT.characterClass);
-                TWFBT.Calculator.values.offense *= workerBonus;
-                TWFBT.Calculator.values.defense *= workerBonus;
-                prettifyResults();
-
-                TWFBT.Calculator.values.lifepoints = Character.maxHealth;
-                window.setTimeout(function() {
-                    showData(side_skill);
-                }, 1000);
-
-            }
-
-
-            var getSideSkill = function(side) {
-                if (side == 'attack') {
-                    return 'hide';
                 } else {
-                    return 'pitfall';
+                    bonusResultArray[bonuses[i].name] += bonuses[i].value;
+                }
+            }
+            return [bonusResultArray['offense'], bonusResultArray['defense'], bonusResultArray['damage'], bonusResultArray['resistance']];
+        },
+
+        getSideSkill: function(side) {
+            if (side == 'attack') {
+                return 'hide';
+            } else {
+                return 'pitfall';
+            }
+        },
+
+        calcSkillWithBonus: function(side_skill, soldierBonus) {
+            TWFBT.Calculator.values.defense_skillwithbonus = Math.pow(CharacterSkills.getSkill(side_skill).getPointsWithBonus(), 0.6) +
+                Math.pow(CharacterSkills.getSkill('dodge').getPointsWithBonus(), 0.5) +
+                Math.pow(CharacterSkills.getSkill('leadership').getPointsWithBonus() * soldierBonus, 0.5);
+            TWFBT.Calculator.values.offense_skillwithbonus = Math.pow(CharacterSkills.getSkill(side_skill).getPointsWithBonus(), 0.6) +
+                Math.pow(CharacterSkills.getSkill('aim').getPointsWithBonus(), 0.5) +
+                Math.pow(CharacterSkills.getSkill('leadership').getPointsWithBonus() * soldierBonus, 0.5);
+        },
+
+        getSoldierBonus: function(pa, characterClass) {
+            var soldierBonus = 1;
+            if (pa && characterClass == 'soldier') {
+                soldierBonus = 1.5;
+            } else if (characterClass == 'soldier') {
+                soldierBonus = 1.25;
+            }
+            return soldierBonus;
+        },
+
+        getWorkerBonus: function(pa, characterClass) {
+            var workerBonus = 1;
+            if (pa && characterClass == 'worker') {
+                workerBonus = 1.4;
+            } else if (characterClass == 'worker') {
+                workerBonus = 1.2;
+            }
+            return workerBonus;
+        },
+
+        prettifyResults: function() {
+            for (var value in TWFBT.Calculator.values) {
+                if (TWFBT.Calculator.values.hasOwnProperty(value)) {
+                    TWFBT.Calculator.values[value] = Math.round(TWFBT.Calculator.values[value] * 100) / 100;
+                }
+            }
+        },
+
+        addBonusesTogether: function() {
+            TWFBT.Calculator.values.offense += TWFBT.Calculator.values.offense_defaultbonus;
+            TWFBT.Calculator.values.defense += TWFBT.Calculator.values.defense_defaultbonus;
+            TWFBT.Calculator.values.offense += TWFBT.Calculator.values.offense_fortbattlebonus;
+            TWFBT.Calculator.values.defense += TWFBT.Calculator.values.defense_fortbattlebonus;
+            TWFBT.Calculator.values.offense += TWFBT.Calculator.values.offense_skillwithbonus;
+            TWFBT.Calculator.values.defense += TWFBT.Calculator.values.defense_skillwithbonus;
+            TWFBT.Calculator.values.offense += TWFBT.Calculator.values.offense_setbonus;
+            TWFBT.Calculator.values.defense += TWFBT.Calculator.values.defense_setbonus;
+            TWFBT.Calculator.values.resistance += TWFBT.Calculator.values.resistanceSkill;
+        },
+
+        showData: function(side_skill) {
+
+            var content = $('<tr></tr>');
+            content.append('<th colspan="9">' + TWFBTlang[TWFBT.side] + '</th>');
+            $('#TWFBTCalculatorTable').append(content);
+
+            var content = $('<tr><th>' +
+                TWFBTlang.leadership + '</th><th>' +
+                TWFBTlang[side_skill] + '</th><th>' +
+                TWFBTlang.aim + '</th><th>' +
+                TWFBTlang.dodge + '</th><th>' +
+                TWFBTlang.bonusBySkill + '</th><th>' +
+                TWFBTlang.bonusByClothes + '</th><th>' +
+                TWFBTlang.bonusBySets + '</th><th>' +
+                TWFBTlang.bonusDefault + '</th><th>' +
+                TWFBTlang.bonusTotal + '</th></tr>');
+            $('#TWFBTCalculatorTable').append(content);
+
+
+
+            content = $('<tr></tr>');
+            content.append('<td align="center">' + CharacterSkills.getSkill('leadership').getPointsWithBonus() + '</td>');
+            content.append('<td align="center">' + CharacterSkills.getSkill(side_skill).getPointsWithBonus() + '</td>');
+            content.append('<td align="center">' + CharacterSkills.getSkill('aim').getPointsWithBonus() + '</td>');
+            content.append('<td align="center">' + CharacterSkills.getSkill('dodge').getPointsWithBonus() + '</td>');
+            content.append('<td align="center">' + TWFBT.Calculator.values.offense_skillwithbonus + '<br>' + TWFBT.Calculator.values.defense_skillwithbonus + '</td>');
+            content.append('<td align="center">' + TWFBT.Calculator.values.offense_fortbattlebonus + '<br>' + TWFBT.Calculator.values.defense_fortbattlebonus + '</td>');
+            content.append('<td align="center">' + TWFBT.Calculator.values.offense_setbonus + '<br>' + TWFBT.Calculator.values.defense_setbonus + '</td>');
+            content.append('<td align="center">' + TWFBT.Calculator.values.offense_defaultbonus + '<br>' + TWFBT.Calculator.values.defense_defaultbonus + '</td>');
+            content.append('<td align="center">' + TWFBT.Calculator.values.offense + '<br>' + TWFBT.Calculator.values.defense + '</td>');
+            $('#TWFBTCalculatorTable').append(content);
+
+            content = $('<tr></tr>');
+            content.append('<th colspan="2">' + TWFBTlang.damage + '</th><td align="left">' + TWFBT.Calculator.values.damage + '</td>' +
+                '<th colspan="2">' + TWFBTlang.resistance + '</th><td align="left">' + TWFBT.Calculator.values.resistance + '</td>' +
+                '<th colspan="2">' + TWFBTlang.lifepoints + '</th><td align="left">' + TWFBT.Calculator.values.lifepoints + '</td>');
+            $('#TWFBTCalculatorTable').append(content);
+
+
+            content = $('<tr></tr>');
+
+            var item_string = '';
+            for (item in Wear.wear) {
+                if (Wear.wear.hasOwnProperty(item)) {
+                    var item_obj = Wear.wear[item].obj;
+                    var popup = new ItemPopup(item_obj, {
+                        character: {
+                            level: Character.level
+
+                        }
+                    }).popup;
+                    item_string += '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + popup.getXHTML().escapeHTML() + '">' + item_obj.name + '<img width="15" height="15" src="' + item_obj.image + '"> </a>';
                 }
             }
 
-            var calcSkillWithBonus = function(side_skill, soldierBonus) {
-                TWFBT.Calculator.values.defense_skillwithbonus = Math.pow(CharacterSkills.getSkill(side_skill).getPointsWithBonus(), 0.6) +
-                    Math.pow(CharacterSkills.getSkill('dodge').getPointsWithBonus(), 0.5) +
-                    Math.pow(CharacterSkills.getSkill('leadership').getPointsWithBonus() * soldierBonus, 0.5);
-                TWFBT.Calculator.values.defense += TWFBT.Calculator.values.defense_skillwithbonus;
-                TWFBT.Calculator.values.offense_skillwithbonus = Math.pow(CharacterSkills.getSkill(side_skill).getPointsWithBonus(), 0.6) +
-                    Math.pow(CharacterSkills.getSkill('aim').getPointsWithBonus(), 0.5) +
-                    Math.pow(CharacterSkills.getSkill('leadership').getPointsWithBonus() * soldierBonus, 0.5);
-                TWFBT.Calculator.values.offense += TWFBT.Calculator.values.offense_skillwithbonus;
+            content.append('<th>' + TWFBTlang.clothes + '</th><td align="left" colspan="8">' + item_string + '</td>');
+            $('#TWFBTCalculatorTable').append(content);
 
+            /*var buttontest = new west.gui.Button('Wieder anziehen', function () {
+
+            });*/
+            //content.append('<td colspan="2">' + buttontest.getMainDiv() +'</td>');
+            //content.append('<td colspan="2"><a href="clearTable()">Wieder anziehen</a> +</td>');
+
+            /*
+            //calc new worker bonus
+            var workerBonus = 1;
+            if(TWFBT.pa && TWFBT.characterClass == 'worker'){
+              workerBonus = 1.4;
+            } else if (TWFBT.characterClass == 'worker') {
+              workerBonus = 1.2;
             }
 
-            var getSoldierBonus = function(pa, characterClass) {
-                var soldierBonus = 1;
-                if (pa && characterClass == 'soldier') {
-                    soldierBonus = 1.5;
-                } else if (characterClass == 'soldier') {
-                    soldierBonus = 1.25;
-                }
-                return soldierBonus;
-            }
-
-            var getWorkerBonus = function(pa, characterClass) {
-                var workerBonus = 1;
-                if (pa && characterClass == 'worker') {
-                    workerBonus = 1.4;
-                } else if (characterClass == 'worker') {
-                    workerBonus = 1.2;
-                }
-                return workerBonus;
-            }
-
-            var prettifyResults = function() {
-                for (var value in TWFBT.Calculator.newValues) {
-                    if (TWFBT.Calculator.newValues.hasOwnProperty(value)) {
-                        TWFBT.Calculator.newValues[value] = Math.round(TWFBT.Calculator.newValues[value] * 100) / 100;
-                    }
-                }
-                /*for each(var value in TWFBT.Calculator.newValues) {
-                    value = Math.round(value * 100) / 100;
-                }*/
-                /*TWFBT.Calculator.values.offense_skillwithbonus = Math.round(TWFBT.Calculator.values.offense_skillwithbonus * 100) / 100;
-                TWFBT.Calculator.values.defense_skillwithbonus = Math.round(TWFBT.Calculator.values.defense_skillwithbonus * 100) / 100;
-                TWFBT.Calculator.values.offense_fortbattlebonus = Math.round(TWFBT.Calculator.values.offense_fortbattlebonus * 100) / 100;
-                TWFBT.Calculator.values.defense_fortbattlebonus = Math.round(TWFBT.Calculator.values.defense_fortbattlebonus * 100) / 100;
-                TWFBT.Calculator.values.offense_setbonus = Math.round(TWFBT.Calculator.values.offense_setbonus * 100) / 100;
-                TWFBT.Calculator.values.defense_setbonus = Math.round(TWFBT.Calculator.values.defense_setbonus * 100) / 100;
-
-                TWFBT.Calculator.values.offense = Math.round(TWFBT.Calculator.values.offense * 100) / 100;
-                TWFBT.Calculator.values.defense = Math.round(TWFBT.Calculator.values.defense * 100) / 100;
-
-                TWFBT.Calculator.values.damage = Math.ceil(Math.round(TWFBT.Calculator.values.damage * 10) / 10);*/
-            }
-
-            var showData = function(side_skill) {
-
-                var content = $('<tr></tr>');
-                content.append('<th colspan="9">' + TWFBTlang[TWFBT.side] + '</th>');
-                $('#TWFBTCalculatorTable').append(content);
-
-                var content = $('<tr><th>' +
-                    TWFBTlang.leadership + '</th><th>' +
-                    TWFBTlang[side_skill] + '</th><th>' +
-                    TWFBTlang.aim + '</th><th>' +
-                    TWFBTlang.dodge + '</th><th>' +
-                    TWFBTlang.bonusBySkill + '</th><th>' +
-                    TWFBTlang.bonusByClothes + '</th><th>' +
-                    TWFBTlang.bonusBySets + '</th><th>' +
-                    TWFBTlang.bonusDefault + '</th><th>' +
-                    TWFBTlang.bonusTotal + '</th></tr>');
-                $('#TWFBTCalculatorTable').append(content);
+            var attplus = TWFBT.Calculator.values.offense+TWFBT.Calculator.values.offense_skillwithbonus*(workerBonus-1);
+            var deffplus = TWFBT.Calculator.values.defense+TWFBT.Calculator.values.defense_skillwithbonus*(workerBonus-1);
+            var string = '';
+            string = string.concat('Total Att: ' + TWFBT.Calculator.values.offense*workerBonus + '\n');
+            string = string.concat('Total Deff: ' + TWFBT.Calculator.values.defense*workerBonus + '\n')
+            //string = string.concat('Skill Att: ' + TWFBT.Calculator.values.offense_skillwithbonus*workerBonus + '\n');
+            //string = string.concat('Skill Deff: ' + TWFBT.Calculator.values.defense_skillwithbonus*workerBonus + '\n');
+            string = string.concat('Skill Att: ' + attplus + '\n');
+            string = string.concat('Skill Deff: ' + deffplus + '\n')
+            alert(string);*/
 
 
-
-                content = $('<tr></tr>');
-                content.append('<td align="center">' + CharacterSkills.getSkill('leadership').getPointsWithBonus() + '</td>');
-                content.append('<td align="center">' + CharacterSkills.getSkill(side_skill).getPointsWithBonus() + '</td>');
-                content.append('<td align="center">' + CharacterSkills.getSkill('aim').getPointsWithBonus() + '</td>');
-                content.append('<td align="center">' + CharacterSkills.getSkill('dodge').getPointsWithBonus() + '</td>');
-                content.append('<td align="center">' + TWFBT.Calculator.values.offense_skillwithbonus + '<br>' + TWFBT.Calculator.values.defense_skillwithbonus + '</td>');
-                content.append('<td align="center">' + TWFBT.Calculator.values.offense_fortbattlebonus + '<br>' + TWFBT.Calculator.values.defense_fortbattlebonus + '</td>');
-                content.append('<td align="center">' + TWFBT.Calculator.values.offense_setbonus + '<br>' + TWFBT.Calculator.values.defense_setbonus + '</td>');
-                content.append('<td align="center">' + TWFBT.Calculator.values.offense_defaultbonus + '<br>' + TWFBT.Calculator.values.defense_defaultbonus + '</td>');
-                content.append('<td align="center">' + TWFBT.Calculator.values.offense + '<br>' + TWFBT.Calculator.values.defense + '</td>');
-                $('#TWFBTCalculatorTable').append(content);
-
-                content = $('<tr></tr>');
-                content.append('<th colspan="2">' + TWFBTlang.damage + '</th><td align="left">' + TWFBT.Calculator.values.damage + '</td>' +
-                    '<th colspan="2">' + TWFBTlang.resistance + '</th><td align="left">' + TWFBT.Calculator.values.resistance + '</td>' +
-                    '<th colspan="2">' + TWFBTlang.lifepoints + '</th><td align="left">' + TWFBT.Calculator.values.lifepoints + '</td>');
-                $('#TWFBTCalculatorTable').append(content);
-
-
-                content = $('<tr></tr>');
-                var items = ['animal', 'belt', 'body', 'foot', 'head', 'left_arm', 'neck', 'pants', 'right_arm', 'yield'];
-                var item_string = '';
-                //MessageSuccess(items[0]+' '+items[1]+' '+items[2]+' '+items[3]+' '+items[4]+' ').show();
-                /*for(i=0 ; i<items.length; i++){
-                	try {
-                		item_string += '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + escapeHTML(new ItemPopup(ItemManager.get(Wear.get(items[i]).obj.item_id)).getXHTML()) + '">' + ItemManager.get(Wear.get(items[i]).obj.item_id).name + ' <img width="15" height="15" src="' + ItemManager.get(Wear.get(items[i]).obj.item_id).image + '"></a>';
-                	} catch (e) {
-                	}
-                }*/
-                try {
-                    item_string += '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + escapeHTML(new ItemPopup(ItemManager.get(Wear.get(items[0]).obj.item_id)).getXHTML()) + '">' + ItemManager.get(Wear.get(items[0]).obj.item_id).name + ' <img width="15" height="15" src="' + ItemManager.get(Wear.get(items[0]).obj.item_id).image + '"></a>';
-                } catch (e) {}
-                try {
-                    item_string += '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + escapeHTML(new ItemPopup(ItemManager.get(Wear.get(items[1]).obj.item_id)).getXHTML()) + '">' + ItemManager.get(Wear.get(items[1]).obj.item_id).name + ' <img width="15" height="15" src="' + ItemManager.get(Wear.get(items[1]).obj.item_id).image + '"></a>';
-                } catch (e) {}
-                try {
-                    item_string += '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + escapeHTML(new ItemPopup(ItemManager.get(Wear.get(items[2]).obj.item_id)).getXHTML()) + '">' + ItemManager.get(Wear.get(items[2]).obj.item_id).name + ' <img width="15" height="15" src="' + ItemManager.get(Wear.get(items[2]).obj.item_id).image + '"></a>';
-                } catch (e) {}
-                try {
-                    item_string += '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + escapeHTML(new ItemPopup(ItemManager.get(Wear.get(items[3]).obj.item_id)).getXHTML()) + '">' + ItemManager.get(Wear.get(items[3]).obj.item_id).name + ' <img width="15" height="15" src="' + ItemManager.get(Wear.get(items[3]).obj.item_id).image + '"></a>';
-                } catch (e) {}
-                try {
-                    item_string += '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + escapeHTML(new ItemPopup(ItemManager.get(Wear.get(items[4]).obj.item_id)).getXHTML()) + '">' + ItemManager.get(Wear.get(items[4]).obj.item_id).name + ' <img width="15" height="15" src="' + ItemManager.get(Wear.get(items[4]).obj.item_id).image + '"></a>';
-                } catch (e) {}
-                try {
-                    item_string += '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + escapeHTML(new ItemPopup(ItemManager.get(Wear.get(items[5]).obj.item_id)).getXHTML()) + '">' + ItemManager.get(Wear.get(items[5]).obj.item_id).name + ' <img width="15" height="15" src="' + ItemManager.get(Wear.get(items[5]).obj.item_id).image + '"></a>';
-                } catch (e) {}
-                try {
-                    item_string += '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + escapeHTML(new ItemPopup(ItemManager.get(Wear.get(items[6]).obj.item_id)).getXHTML()) + '">' + ItemManager.get(Wear.get(items[6]).obj.item_id).name + ' <img width="15" height="15" src="' + ItemManager.get(Wear.get(items[6]).obj.item_id).image + '"></a>';
-                } catch (e) {}
-                try {
-                    item_string += '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + escapeHTML(new ItemPopup(ItemManager.get(Wear.get(items[7]).obj.item_id)).getXHTML()) + '">' + ItemManager.get(Wear.get(items[7]).obj.item_id).name + ' <img width="15" height="15" src="' + ItemManager.get(Wear.get(items[7]).obj.item_id).image + '"></a>';
-                } catch (e) {}
-                try {
-                    item_string += '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + escapeHTML(new ItemPopup(ItemManager.get(Wear.get(items[8]).obj.item_id)).getXHTML()) + '">' + ItemManager.get(Wear.get(items[8]).obj.item_id).name + ' <img width="15" height="15" src="' + ItemManager.get(Wear.get(items[8]).obj.item_id).image + '"></a>';
-                } catch (e) {}
-                try {
-                    item_string += '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + escapeHTML(new ItemPopup(ItemManager.get(Wear.get(items[9]).obj.item_id)).getXHTML()) + '">' + ItemManager.get(Wear.get(items[9]).obj.item_id).name + ' <img width="15" height="15" src="' + ItemManager.get(Wear.get(items[9]).obj.item_id).image + '"></a>';
-                } catch (e) {}
-                content.append('<th>' + TWFBTlang.clothes + '</th><td align="left" colspan="8">' + item_string + '</td>');
-                $('#TWFBTCalculatorTable').append(content);
-
-                /*var buttontest = new west.gui.Button('Wieder anziehen', function () {
-
-                });*/
-                //content.append('<td colspan="2">' + buttontest.getMainDiv() +'</td>');
-                //content.append('<td colspan="2"><a href="clearTable()">Wieder anziehen</a> +</td>');
-
-                /*
-                //calc new worker bonus
-                var workerBonus = 1;
-                if(TWFBT.pa && TWFBT.characterClass == 'worker'){
-                	workerBonus = 1.4;
-                } else if (TWFBT.characterClass == 'worker') {
-                	workerBonus = 1.2;
-                }
-
-                var attplus = TWFBT.Calculator.values.offense+TWFBT.Calculator.values.offense_skillwithbonus*(workerBonus-1);
-                var deffplus = TWFBT.Calculator.values.defense+TWFBT.Calculator.values.defense_skillwithbonus*(workerBonus-1);
-                var string = '';
-                string = string.concat('Total Att: ' + TWFBT.Calculator.values.offense*workerBonus + '\n');
-                string = string.concat('Total Deff: ' + TWFBT.Calculator.values.defense*workerBonus + '\n')
-                //string = string.concat('Skill Att: ' + TWFBT.Calculator.values.offense_skillwithbonus*workerBonus + '\n');
-                //string = string.concat('Skill Deff: ' + TWFBT.Calculator.values.defense_skillwithbonus*workerBonus + '\n');
-                string = string.concat('Skill Att: ' + attplus + '\n');
-                string = string.concat('Skill Deff: ' + deffplus + '\n')
-                alert(string);*/
-
-
-            }
-
-            var escapeHTML = function(unsafe_str) {
-                return unsafe_str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/\'/g, '&#39;');
-            }
-        }
+        },
     };
 
     TWFBT.Generator = {
