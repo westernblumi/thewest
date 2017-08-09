@@ -846,6 +846,24 @@
             $('.textart_title', wnd).css('display', '');
             TWFBT.Statistics.window.activateTab(tab);
         },
+        showCriticalHits: function() {
+            TWFBT.Statistics.getDefault('TWFBTTesterTab2');
+            TWFBT.Statistics.window.setTitle(TWFBTlang.scriptName);
+            var featScroll = new west.gui.Scrollpane();
+
+            $(featScroll.getMainDiv()).css({
+                'margin-top': '5px'
+            });
+            featScroll.appendContent('<br>');
+
+            var fightLog = TWFBT.Statistics.stats;
+
+
+
+            featScroll.appendContent('<br><br>');
+            $(TWFBT.Statistics.window.getContentPane()).append(featScroll.getMainDiv());
+        },
+
         showStats2: function() {
             TWFBT.Statistics.getDefault('TWFBTTesterTab2');
             TWFBT.Statistics.window.setTitle(TWFBTlang.scriptName);
