@@ -4,7 +4,7 @@
 // @author westernblumi
 // @description Fort battle tools for The West!
 // @include https://*.the-west.*/game.php*
-// @version	1.10
+// @version	1.11
 // @grant none
 // ==/UserScript==
 // translation: westernblumi(German & English), pepe100(Spanish), Ruslan Jackson(Italiano)
@@ -16,7 +16,7 @@
     document.body.removeChild(script);
 })(function() {
     TWFBTstart = {
-        version: '1.10',
+        version: '1.11',
         langs: {
             en: {
                 language: 'English',
@@ -97,6 +97,9 @@
 				rank: 'Rank',
 				weapons: 'Weapons',
 				weapon: 'Weapon',
+				damageBuff: 'Damage buff',
+				noBuff: 'No damage buff',
+				sectorBonus: 'Sector bonus',
             },
             de: {
                 language: 'German (Deutsch)',
@@ -177,86 +180,92 @@
 				rank: 'Rang',
 				weapons: 'Waffen',
 				weapon: 'Waffe',
+				damageBuff: 'Schadensbuff',
+				noBuff: 'Kein Schadensbuff',
+				sectorBonus: 'Sektorbonus',
             },
             es: {
                 language: 'Español',
-                aim: 'Apuntar',
-                adventurer: 'Adventurero',
-                attack: 'Ataque',
-                bonusByClothes: 'Bono por Ropas',
-                bonusBySets: 'Bono por Conjuntos',
-                bonusBySkill: 'Bono por Habilidad',
-                bonusDefault: 'Bono por Defecto',
-                bonusTotal: 'Total',
-                calcBonus: 'Calcular Bono de Batalla',
-                calculator: 'Calculadora',
-                clear: 'Limpiar Ventana',
-                clothes: 'Ropa',
-                damage: 'Bono de Daño',
-                defense: 'Defensa',
-                dodge: 'Eludir',
-                duelist: 'Duelista',
-                endurance: 'Condición',
-                hide: 'Esconder',
-                leadership: 'Liderazgo',
-                lifepoints: 'Puntos de Vida',
-                newFormula: 'fórmula nueva',
-                oldFormula: 'fórmula antigua',
-                pa: 'Premium (bonus Soldado/Trabajador)',
-                pitfall: 'Poner trampas',
-                resistance: 'Resistencia',
-                scriptName: 'The West Fortbattle Tool',
-                soldier: 'Soldado',
-                worker: 'Trabajador',
-                name: 'Nombre',
-                author: 'Autor: ',
-                version: 'Versión: ',
-                update: 'actualizar',
-                updateAvailable: 'Una nueva versión del script está disponible',
-				showFurtherStatistics: 'Show more statistics',
-                team: 'Team',
-                player: 'Player',
-                playerCount: 'Number of players',
-                survivingPlayerCount: 'Surviving players',
-                offlinePlayerCount: 'Offline players',
-                adventurers: 'Adventurers',
-                duelists: 'Duelists',
-                greenhorns: 'Greenhorns',
-                soldiers: 'Soldiers',
-                workers: 'Workers',
-                maxhp: 'Maximum healthpoints',
-                starthp: 'Health at the start of the battle',
-                finishedhp: 'Health at the end of the battle',
-                totalcauseddamage: 'Total damage inflicted',
-                hitcount: 'Hits',
-                misscount: 'Misses',
-                dodgecount: 'Dodges',
-                takenhits: 'Hits taken',
-                crithits: 'Critical Hits',
-                diedwhen: 'Average lifetime',
-                onlinecount: 'Average online rounds',
-                takendamage: 'Taken damage',
-                charlevel: 'Average level',
-                criticalHits: 'Kritische Treffer',
-				points: 'Points',
+				aim: 'Apuntar',
+				adventurer: 'Adventurero',
+				attack: 'Ataque',
+				bonusByClothes: 'Bono por Ropas',
+				bonusBySets: 'Bono por Conjuntos',
+				bonusBySkill: 'Bono por Habilidad',
+				bonusDefault: 'Bono por Defecto',
+				bonusTotal: 'Total',
+				calcBonus: 'Calcular Bono de Batalla',
+				calculator: 'Calculadora',
+				clear: 'Limpiar Ventana',
+				clothes: 'Ropa',
+				damage: 'Bono de Daño',
+				defense: 'Defensa',
+				dodge: 'Eludir',
+				duelist: 'Duelista',
+				endurance: 'Condición',
+				hide: 'Esconder',
+				leadership: 'Liderazgo',
+				lifepoints: 'Puntos de Vida',
+				newFormula: 'fórmula nueva',
+				oldFormula: 'fórmula antigua',
+				pa: 'Premium (bonus Soldado/Trabajador)',
+				pitfall: 'Poner trampas',
+				resistance: 'Resistencia',
+				scriptName: 'The West Fortbattle Tool',
+				soldier: 'Soldado',
+				worker: 'Trabajador',
+				name: 'Nombre',
+				author: 'Autor: ',
+				version: 'Versión: ',
+				update: 'actualizar',
+				updateAvailable: 'Una nueva versión del script está disponible',
+				showFurtherStatistics: 'Mostrar más estadísticas',
+				team: 'Equipo',
+				player: 'Jugador',
+				playerCount: 'Número de jugadores',
+				survivingPlayerCount: 'Jugadores supervivientes',
+				offlinePlayerCount: 'Jugadores Off',
+				adventurers: 'Aventureros',
+				duelists: 'Duelistas',
+				greenhorns: 'Novatos',
+				soldiers: 'Soldados',
+				workers: 'Trabajadores',
+				maxhp: 'Puntos de salud máximos',
+				starthp: 'Vida al inicio de la batalla',
+				finishedhp: 'Vida al final de la batalla',
+				totalcauseddamage: 'Total daño causado',
+				hitcount: 'Aciertos realizados',
+				misscount: 'Fallos',
+				dodgecount: 'Eludidos',
+				takenhits: 'Aciertos recibidos',
+				crithits: 'Críticos',
+				diedwhen: 'Tiempo de vida promedio',
+				onlinecount: 'Media de rondas On',
+				takendamage: 'Daño recibido',
+				charlevel: 'Nivel medio',
+				criticalHits: 'Críticos',
+				points: 'Puntos',
 				ranking: 'Ranking',
-				town: 'Town',
-				attacker: 'Attacker',
-				defender: 'Defender',
-				charclass: 'Class',
-				side: 'Side',
-				playerName: 'Player name',
-				offliner: 'Offline players',
-				totalShots: 'Total shots',
-				hitPercentage: 'Hits in %',
-				dodgePercentage: 'Dodges in %',
-				damagePerHit: 'Damage per hit',
-				averageWeaponDamage: 'Average weapon damage',
-				shotsPerPlayer: 'Shots',
-				order: 'Order of movement',
-				rank: 'Rank',
-				weapons: 'Weapons',
-				weapon: 'Weapon',
+				town: 'Ciudad',
+				attacker: 'Atacante',
+				defender: 'Defensor',
+				charclass: 'Clase',
+				side: 'Lado',
+				playerName: 'Nombre jugador',
+				offliner: 'Jugadores Off',
+				totalShots: 'Total disparos',
+				hitPercentage: '% Aciertos',
+				dodgePercentage: '% Eludidos',
+				damagePerHit: 'Daño por acierto',
+				averageWeaponDamage: 'Daño medio arma',
+				shotsPerPlayer: 'Disparos',
+				order: 'Orden de movimientos',
+				rank: 'Rango',
+				weapons: 'Armas',
+				weapon: 'Arma',
+				damageBuff: 'Damage buff',
+				noBuff: 'No damage buff',
+				sectorBonus: 'Sector bonus',
             },
 			it: {
 				language: 'Italiano',
@@ -337,6 +346,9 @@
 				rank: 'Rank',
 				weapons: 'Weapons',
 				weapon: 'Weapon',
+				damageBuff: 'Damage buff',
+				noBuff: 'No damage buff',
+				sectorBonus: 'Sector bonus',
 			}, 
         }
     };
@@ -471,7 +483,10 @@
                 defense_fortbattlebonus: 0,
                 offense_setbonus: 0,
                 defense_setbonus: 0,
-                damage: 0,
+                damage: '',
+				damageSector: 0,
+				damageMin: 0,
+				damageMax: 0,
                 resistance: 0,
                 resistanceSkill: 0,
                 lifepoints: 0,
@@ -490,7 +505,13 @@
             var workerBonus = this.getWorkerBonus(TWFBT.pa, TWFBT.characterClass);
             TWFBT.Calculator.values.offense *= workerBonus;
             TWFBT.Calculator.values.defense *= workerBonus;
-
+			
+			
+			var min = TWFBT.Calculator.values.damageMin + TWFBT.Calculator.values.damageSector + ((TWFBT.Calculator.values.damageMin + TWFBT.Calculator.values.damageSector) * CharacterSkills.getSkill('leadership').getPointsWithBonus() / Character.maxHealth);
+			var max = TWFBT.Calculator.values.damageMax + TWFBT.Calculator.values.damageSector + ((TWFBT.Calculator.values.damageMax + TWFBT.Calculator.values.damageSector) * CharacterSkills.getSkill('leadership').getPointsWithBonus() / Character.maxHealth);
+			
+			TWFBT.Calculator.values.damage = Math.round(min).toString() + '-' + Math.round(max).toString();
+			
             this.prettifyResults();
 
             window.setTimeout(function() {
@@ -508,7 +529,13 @@
                     TWFBT.Calculator.values.defense_fortbattlebonus += item_obj.bonus.fortbattlesector.defense;
                     TWFBT.Calculator.values.offense_fortbattlebonus += item_obj.bonus.fortbattle.offense;
                     TWFBT.Calculator.values.offense_fortbattlebonus += item_obj.bonus.fortbattlesector.offense;
-                    TWFBT.Calculator.values.damage += item_obj.bonus.fortbattlesector.damage;
+                    //TWFBT.Calculator.values.damage += item_obj.bonus.fortbattlesector.damage;
+					TWFBT.Calculator.values.damageSector += item_obj.bonus.fortbattlesector.damage;
+					if(item_obj.type === 'left_arm') {
+						TWFBT.Calculator.values.damageMax = item_obj.getDamage(Character).max;
+						TWFBT.Calculator.values.damageMin = item_obj.getDamage(Character).min;
+					}
+					
                     TWFBT.Calculator.values.resistance += item_obj.bonus.fortbattle.resistance;
 
                     for (j = 0; j < item_obj.bonus.item.length; j++) {
@@ -520,7 +547,8 @@
                                 TWFBT.Calculator.values.defense_fortbattlebonus += item_obj.bonus.item[j].value;
                                 break;
                             case 'damage':
-                                TWFBT.Calculator.values.damage += item_obj.bonus.item[j].value;
+                                //TWFBT.Calculator.values.damage += item_obj.bonus.item[j].value;
+								TWFBT.Calculator.values.damageSector += item_obj.bonus.fortbattlesector.damage;
                                 break;
                         }
                     }
@@ -542,7 +570,8 @@
                     setbonusArray = this.getSetBonus(set, sets[set]);
                     TWFBT.Calculator.values.offense_setbonus += setbonusArray[0];
                     TWFBT.Calculator.values.defense_setbonus += setbonusArray[1];
-                    TWFBT.Calculator.values.damage += setbonusArray[2];
+                    //TWFBT.Calculator.values.damage += setbonusArray[2];
+					TWFBT.Calculator.values.damageSector += setbonusArray[2];
                     TWFBT.Calculator.values.resistance += setbonusArray[3];
                 }
             }
@@ -610,7 +639,7 @@
 
         prettifyResults: function() {
             for (var value in TWFBT.Calculator.values) {
-                if (TWFBT.Calculator.values.hasOwnProperty(value)) {
+                if (TWFBT.Calculator.values.hasOwnProperty(value) && value != 'damage') {
                     TWFBT.Calculator.values[value] = Math.floor(TWFBT.Calculator.values[value] * 100) / 100;
                 }
             }
@@ -659,9 +688,9 @@
             $('#TWFBTCalculatorTable').append(content);
 
             content = $('<tr></tr>');
-            content.append('<th colspan="2">' + TWFBTlang.damage + '</th><td align="left">' + TWFBT.Calculator.values.damage + '</td>' +
-                '<th colspan="2">' + TWFBTlang.resistance + '</th><td align="left">' + TWFBT.Calculator.values.resistance + '</td>' +
-                '<th colspan="2">' + TWFBTlang.lifepoints + '</th><td align="left">' + TWFBT.Calculator.values.lifepoints + '</td>');
+            content.append('<th>' + TWFBTlang.damage + '</th><td align="center" style="vertical-align:middle;" colspan="2">' + TWFBT.Calculator.values.damage + '<br>(' + TWFBT.Calculator.values.damageSector + ' ' + TWFBTlang.sectorBonus + ')</td>' +
+                '<th colspan="2">' + TWFBTlang.resistance + '</th><td align="center" style="vertical-align:middle;">' + TWFBT.Calculator.values.resistance + '</td>' +
+                '<th colspan="2">' + TWFBTlang.lifepoints + '</th><td align="center" style="vertical-align:middle;">' + TWFBT.Calculator.values.lifepoints + '</td>');
             $('#TWFBTCalculatorTable').append(content);
 
             content = $('<tr></tr>');
@@ -735,7 +764,16 @@
 			featScroll.appendContent(TWFBT.Statistics.getProgressBarWithStats(TWFBT.Statistics.getCharClasses('soldiers')));
 			featScroll.appendContent(TWFBT.Statistics.getProgressBarWithStats(TWFBT.Statistics.getCharClasses('workers')));
 			featScroll.appendContent(TWFBT.Statistics.getProgressBarWithStats(TWFBT.Statistics.getCharClasses('greenhorns')));
-			
+			var buffs = TWFBT.Statistics.getBuffs();
+			for(buff in buffs[0]){
+				if(buffs[0].hasOwnProperty(buff)){
+					if(buff != '0-0'){
+						featScroll.appendContent(TWFBT.Statistics.getProgressBar(buffs[0][buff], buffs[1][buff], TWFBTlang.damageBuff+ ' +' + buff));
+					} else {
+						featScroll.appendContent(TWFBT.Statistics.getProgressBar(buffs[0][buff], buffs[1][buff], TWFBTlang.noBuff));
+					}
+				}
+			}
             $(TWFBT.Statistics.window.getContentPane()).append(featScroll.getMainDiv());
         },
 		showPerPlayerStatsTab: function() {
@@ -772,30 +810,6 @@
 			
 			var currArray = TWFBT.Statistics.getPlayerRanking();
 			
-			var thName = $('<a>'+TWFBTlang.playerName+'</a>').click(function(){ TWFBT.Statistics.showRanking(sort == 'name' ? 'name_desc' : 'name'); return false; });
-			var thPoints = $('<a>'+TWFBTlang.points+'</a>').click(function(){ TWFBT.Statistics.showRanking(sort == 'points' ? 'points_desc' : 'points'); return false; });
-			var thSide = $('<a>'+TWFBTlang.side+'</a>').click(function(){ TWFBT.Statistics.showRanking(sort == 'side' ? 'side_desc' : 'side'); return false; });
-			var thCharclass = $('<a>'+TWFBTlang.charclass+'</a>').click(function(){ TWFBT.Statistics.showRanking(sort == 'charclass' ? 'charclass_desc' : 'charclass'); return false; });
-			var thTotalCausedDamage = $(TWFBT.Statistics.getReportIcon(TWFBTlang.totalcauseddamage, '0 -51px')).click(function(){ TWFBT.Statistics.showRanking(sort == 'totalcauseddamage' ? 'totalcauseddamage_desc' : 'totalcauseddamage'); return false; });
-			var thTakenHits = $(TWFBT.Statistics.getReportIcon(TWFBTlang.takenhits, '0 -102px')).click(function(){ TWFBT.Statistics.showRanking(sort == 'takenhits' ? 'takenhits_desc' : 'takenhits'); return false; });
-			var thDodgeCount = $(TWFBT.Statistics.getReportIcon(TWFBTlang.dodgecount, '0 -153px')).click(function(){ TWFBT.Statistics.showRanking(sort == 'dodgecount' ? 'dodgecount_desc' : 'dodgecount'); return false; });
-			
-			var mytable = new west.gui.Table().setId('TWFBT_ranking_table')
-			.addColumn("TWFBT_ranking_name")
-			.addColumn("TWFBT_ranking_points")
-			.addColumn("TWFBT_ranking_side")
-			.addColumn("TWFBT_ranking_charclass")
-			.addColumn("TWFBT_ranking_totalcauseddamage")
-			.addColumn("TWFBT_ranking_takenhits")
-			.addColumn("TWFBT_ranking_dodgecount")
-			.appendToCell("head", "TWFBT_ranking_name", thName)
-			.appendToCell("head", "TWFBT_ranking_points", thPoints)
-			.appendToCell("head", "TWFBT_ranking_side", thSide)
-			.appendToCell("head", "TWFBT_ranking_charclass", thCharclass)
-			.appendToCell("head", "TWFBT_ranking_totalcauseddamage", thTotalCausedDamage)
-			.appendToCell("head", "TWFBT_ranking_takenhits", thTakenHits)
-			.appendToCell("head", "TWFBT_ranking_dodgecount", thDodgeCount);
-			
 			switch(sort) {
 				case "takenhits" 	:	currArray.sort(this.sortByTakenHits); break;
 				case "takenhits_desc"	:	currArray.sort(this.sortByTakenHits).reverse(); break;
@@ -813,6 +827,30 @@
 				case "name"	:
 				default		:	sort = "name"; currArray.sort(this.sortByName);
 			}
+			
+			var thName = $('<a>'+TWFBTlang.playerName+'</a>').click(function(){ TWFBT.Statistics.showRanking(sort == 'name_desc' ? 'name' : 'name_desc'); return false; });
+			var thPoints = $('<a>'+TWFBTlang.points+'</a>').click(function(){ TWFBT.Statistics.showRanking(sort == 'points_desc' ? 'points' : 'points_desc'); return false; });
+			var thSide = $('<a>'+TWFBTlang.side+'</a>').click(function(){ TWFBT.Statistics.showRanking(sort == 'side_desc' ? 'side' : 'side_desc'); return false; });
+			var thCharclass = $('<a>'+TWFBTlang.charclass+'</a>').click(function(){ TWFBT.Statistics.showRanking(sort == 'charclass_desc' ? 'charclass' : 'charclass_desc'); return false; });
+			var thTotalCausedDamage = $(TWFBT.Statistics.getReportIcon(TWFBTlang.totalcauseddamage, '0 -51px')).click(function(){ TWFBT.Statistics.showRanking(sort == 'totalcauseddamage_desc' ? 'totalcauseddamage' : 'totalcauseddamage_desc'); return false; });
+			var thTakenHits = $(TWFBT.Statistics.getReportIcon(TWFBTlang.takenhits, '0 -102px')).click(function(){ TWFBT.Statistics.showRanking(sort == 'takenhits_desc' ? 'takenhits' : 'takenhits_desc'); return false; });
+			var thDodgeCount = $(TWFBT.Statistics.getReportIcon(TWFBTlang.dodgecount, '0 -153px')).click(function(){ TWFBT.Statistics.showRanking(sort == 'dodgecount_desc' ? 'dodgecount' : 'dodgecount_desc'); return false; });
+			
+			var mytable = new west.gui.Table().setId('TWFBT_ranking_table')
+			.addColumn("TWFBT_ranking_name")
+			.addColumn("TWFBT_ranking_points")
+			.addColumn("TWFBT_ranking_side")
+			.addColumn("TWFBT_ranking_charclass")
+			.addColumn("TWFBT_ranking_totalcauseddamage")
+			.addColumn("TWFBT_ranking_takenhits")
+			.addColumn("TWFBT_ranking_dodgecount")
+			.appendToCell("head", "TWFBT_ranking_name", thName)
+			.appendToCell("head", "TWFBT_ranking_points", thPoints)
+			.appendToCell("head", "TWFBT_ranking_side", thSide)
+			.appendToCell("head", "TWFBT_ranking_charclass", thCharclass)
+			.appendToCell("head", "TWFBT_ranking_totalcauseddamage", thTotalCausedDamage)
+			.appendToCell("head", "TWFBT_ranking_takenhits", thTakenHits)
+			.appendToCell("head", "TWFBT_ranking_dodgecount", thDodgeCount);
 			
 			var charclasses = {
 				'-1': 'greenhorn',
@@ -928,12 +966,40 @@
 		sortByDodgeCount: function(a, b) { return a.dodgecount - b.dodgecount; },
 
 		init: function() {
-            CemeteryWindow.backup_showStatUpdateTable = CemeteryWindow.showStatUpdateTable;
+			FortOverviewWindow.RecentBattles._initContent_backup = FortOverviewWindow.RecentBattles._initContent;
+			FortOverviewWindow.RecentBattles._initContent = function () {
+				FortOverviewWindow.RecentBattles._initContent_backup.call(this);
+				if($('.graveyardtable > tbody > tr:nth-child(3) > td').attr("colspan") != 8){
+					for(var i=2; i< $(".graveyardtable > tbody > tr").length; i+=2){
+						var href = $('.graveyardtable > tbody > tr:nth-child('+i+') > td:nth-child(2) > a').attr('href');
+						if(href != undefined){
+							var regex = new RegExp('\,[0-9]+');
+							var battle_id = href.match(regex)[0].substr(1);
+							$('.graveyardtable > tbody > tr:nth-child('+i+')').append('<td><a href="#" onClick="TWFBT.Statistics.getStatsAndLog('+battle_id+');" title="'+TWFBTlang.showFurtherStatistics+'"><img width="15" height="15" src="https://westdes.innogamescdn.com/images/icons/sword.png"></a></td>');
+							$('.graveyardtable > tbody > tr:nth-child('+(i+1)+') > td').attr("colspan", "8");
+						}
+					}
+				}
+				
+			};
+			
+			FortOverviewWindow.createContent_backup = FortOverviewWindow.createContent;
+			FortOverviewWindow.createContent = function (tab, options) {
+				FortOverviewWindow.createContent_backup.call(this, tab, options);
+				
+			};
+			
+			FortOverviewWindow.RecentBattles._init_backup = FortOverviewWindow.RecentBattles.init;
+			FortOverviewWindow.RecentBattles.init = function () {
+				FortOverviewWindow.RecentBattles._init_backup.call(this);
+			};
+			
+            /*CemeteryWindow.backup_showStatUpdateTable = CemeteryWindow.showStatUpdateTable;
             CemeteryWindow.showStatUpdateTable = function(data) {
                 CemeteryWindow.backup_showStatUpdateTable.call(this, data);
                 TWFBT.Statistics.stats = data;
                 $('div.footer').append(' - <a href="#" onClick="TWFBT.Statistics.openStatsGUIOpen();">'+TWFBTlang.showFurtherStatistics+'</a>');
-            };
+            };*/
 			
 			TWFBT.Statistics.getAverage = function(label) {
 				var valueSumAttacker = 0;
@@ -1012,6 +1078,41 @@
 				return [Math.round(averageAttacker/TWFBT.Statistics.stats.attacker_count), Math.round(averageDefender/TWFBT.Statistics.stats.defender_count), 'averageWeaponDamage'];
 			};
 			
+			TWFBT.Statistics.getBuffs = function(){
+				var weaponContainerAttacker = {'0-0': 0, '20-40': 0, '25-25': 0, '25-75': 0, '20-60': 0, '40-60': 0, '30-30': 0, '40-40': 0, '50-50': 0, '60-60': 0, '75-75': 0, '100-100': 0,};
+				var weaponContainerDefender = {'0-0': 0, '20-40': 0, '25-25': 0, '25-75': 0, '20-60': 0, '40-60': 0, '30-30': 0, '40-40': 0, '50-50': 0, '60-60': 0, '75-75': 0, '100-100': 0,};
+				for (x = 0; x < TWFBT.Statistics.stats.attacker_count; x++) {
+					var attacker = TWFBT.Statistics.stats.result.attackerlist[x];
+					var weapon = ItemManager.get(attacker.weaponid);
+					if(weapon == undefined){
+						console.log(attacker.name +' ' +attacker.weaponid);
+					}
+					var damage = weapon.getDamage();
+					var groundDamage = TWFBT.Statistics.getGroundDamage(attacker.charlevel, weapon.bonus.item, weapon.getItemLevel());
+					var damageMin = attacker.weaponmindmg-(damage.min+groundDamage);
+					var damageMax = attacker.weaponmaxdmg-(damage.max+groundDamage);
+					if(weaponContainerAttacker[damageMin + '-' + damageMax] == undefined){
+						damageMin--;
+						damageMax--;
+					} 
+					weaponContainerAttacker[damageMin + '-' + damageMax] += 1;
+				}
+				for (x = 0; x < TWFBT.Statistics.stats.defender_count; x++) {
+					var defender = TWFBT.Statistics.stats.result.defenderlist[x];
+					var weapon = ItemManager.get(defender.weaponid);
+					var damage = weapon.getDamage();
+					var groundDamage = TWFBT.Statistics.getGroundDamage(defender.charlevel, weapon.bonus.item, weapon.getItemLevel());
+					var damageMin = defender.weaponmindmg-(damage.min+groundDamage);
+					var damageMax = defender.weaponmaxdmg-(damage.max+groundDamage);
+					if(weaponContainerDefender[damageMin + '-' + damageMax] == undefined){
+						damageMin--;
+						damageMax--;
+					}
+					weaponContainerDefender[damageMin + '-' + damageMax] += 1;
+				}
+				return [weaponContainerAttacker, weaponContainerDefender];
+			};
+			
 			TWFBT.Statistics.getCharClasses = function(label) {
 				var charclass = '';
 				switch (label) {
@@ -1061,6 +1162,15 @@
 				} else {
 					return [valueSum[1],totalShots[0], undefined, 'blue'];
 				}
+			};
+			
+			TWFBT.Statistics.getGroundDamage = function(charLevel, itemArray, itemLevel){
+				for (var x = 0; x < itemArray.length; x++) {
+					if(itemArray[x].bonus.type == 'damage'){
+						return Math.floor(charLevel * itemArray[x].bonus.value * (1 + itemLevel/10));
+					}
+				}
+				return 0;
 			};
 			
 			TWFBT.Statistics.getHitPercentage = function(side){
@@ -1154,7 +1264,13 @@
 			};
 			
 			TWFBT.Statistics.getProgressBar = function(att, deff, label) {
-				var progress = new west.gui.Progressbar(att, att + deff);
+				var progress;
+				if(att == 0 && deff == 0){
+					progress = new west.gui.Progressbar(0, 1);
+					
+				} else {
+					progress = new west.gui.Progressbar(att, att + deff);
+				}
 				progress.setTextOnly(true);
 				progress.setLabel(label);
 				if(att > deff){
@@ -1165,7 +1281,7 @@
 					progress.setValue(deff);
 				}
 				var obj = progress.getMainDiv();
-				obj[0].childNodes[1].childNodes[3].innerText = att +' / ' + deff;
+				obj[0].childNodes[1].childNodes[3].innerText = format_number(att) +' / ' + format_number(deff);
 				return obj;
 			};
 			
@@ -1214,6 +1330,15 @@
 				var sumHits = TWFBT.Statistics.getValueSums('hitcount');
 				var sumMisses = TWFBT.Statistics.getValueSums('misscount');
 				return [sumHits[0]+sumMisses[0],sumHits[1]+sumMisses[1], 'totalShots'];
+			};
+			
+			TWFBT.Statistics.getStatsAndLog = function(battle_id){
+				Ajax.remoteCallMode('fort_battleresultpage', 'get_battle', {
+					battle_id : battle_id,
+				}, function (data) {
+					TWFBT.Statistics.stats = data.stats;
+					TWFBT.Statistics.openStatsGUIOpen();
+				});
 			};
 			
 			TWFBT.Statistics.getValueSums = function(label){
