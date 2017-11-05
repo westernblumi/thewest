@@ -1,0 +1,1196 @@
+// ==UserScript==
+// @name        The West - Item Inspector
+// @namespace 	Item Inspector
+// @author 		westernblumi
+// @include https://*.the-west.*/game.php*
+// @version	1.03
+// @grant none
+// @description The West - Item Inspector
+// ==/UserScript==
+(function (fn) {
+  var script = document.createElement('script');
+  script.setAttribute('type', 'application/javascript');
+  script.textContent = '(' + fn.toString() + ')();';
+  document.body.appendChild(script);
+  document.body.removeChild(script);
+}) (function () {
+	
+	ItemInspectorStart = {
+		version: '0.52',
+		testatt: '',
+		langs: {
+			en: {
+				language: 'English',
+				fortbattle_damage: 'Schaden',
+				fortbattle_offense: 'Multiplayer-Angriff',
+				fortbattle_defense: 'Multiplayer-Verteidigung',
+				fortbattle_resistance: 'Widerstand',
+				fortbattlesector_defense: 'Multiplayer-Verteidigung (Sektorbonus)',
+				fortbattlesector_offense: 'Multiplayer-Angriff (Sektorbonus)',
+				fortbattlesector_damage: 'Schaden (Sektorbonus)',
+				speed: 'Geschwindigkeit',
+				dollar: 'Verdienst bei Arbeiten und Duellen',
+				experience: 'Erfahrung für Arbeiten, Duelle und Fortkämpfe',
+				luck: 'Glückschance',
+				show: 'Daten anzeigen',
+				showItems: 'Show Items',
+				workpoints: 'Arbeitspunkte',
+				hand_weapon: 'Hand',
+				shot_weapon: 'Shot',
+				damage: 'Damage',
+				selectSet: 'Wähle ein Set...',
+				townConstruction: 'Stadtausbau',
+				totalAttributePoints: 'Total Attribute Points',
+				totalSkillPoints: 'Total Skill Points',
+				sortByTime: 'Release date',
+				sortByName: 'Setname',
+				head: 'Head',
+				neck: 'Neck',
+				body: 'Body',
+				foot: 'Foot',
+				pants: 'Pants',
+				belt: 'Belts',
+				right_arm: 'Duellwaffen',
+				left_arm: 'Gewehr',
+				animal: 'Reittiere',
+				yield: 'Produkte',
+				recipe: 'Rezepte',
+				collection: 'Sammelbilder',
+				yield_buffuse: 'Produkte (Verbauchbares)',
+				yield_crafting: 'Produkte (Crafting)',
+				yield_mapdrop: 'Produkte (findbar)',
+				yield_other: 'Produkte (andere)',
+				sorting: 'Sortierung',
+				level: 'Level',
+				weapon: 'Waffe',
+				all: 'All',
+			},
+			de: {
+				language: 'German (Deutsch)',
+				fortbattle_damage: 'Schaden im FK',
+				fortbattle_offense: 'Multiplayer-Angriff',
+				fortbattle_defense: 'Multiplayer-Verteidigung',
+				fortbattle_resistance: 'Widerstand',
+				fortbattlesector_defense: 'Multiplayer-Verteidigung (Sektorbonus)',
+				fortbattlesector_offense: 'Multiplayer-Angriff (Sektorbonus)',
+				fortbattlesector_damage: 'Schaden (Sektorbonus)',
+				speed: 'Geschwindigkeit',
+				dollar: 'Verdienst bei Arbeiten und Duellen',
+				experience: 'Erfahrung für Arbeiten, Duelle und Fortkämpfe',
+				luck: 'Glückschance',
+				regen: 'Regeneration',
+				pray: 'Beten',
+				show: 'Daten anzeigen',
+				showItems: 'Items anzeigen',
+				workpoints: 'Arbeitspunkte',
+				hand_weapon: 'Schlagwaffe',
+				shot_weapon: 'Schusswaffe',
+				damage: 'Schaden',
+				selectSet: 'Wähle ein Set...',
+				startComparison: 'Wähle ein Set...',
+				townConstruction: 'Stadtausbau',
+				totalAttributePoints: 'Attributspunkte Gesamt',
+				totalSkillPoints: 'Fertigkeitspunkte Gesamt',
+				sortByTime: 'Erscheinungsdatum',
+				sortByName: 'Setname',
+				head: 'Kopfbedeckung',
+				neck: 'Halsbänder',
+				body: 'Bekleidung',
+				foot: 'Schuhe',
+				pants: 'Hosen',
+				belt: 'Gürtel',
+				right_arm: 'Duellwaffen',
+				left_arm: 'Gewehr',
+				animal: 'Reittiere',
+				yield: 'Produkte',
+				recipe: 'Rezepte',
+				collection: 'Sammelbilder',
+				yield_buffuse: 'Produkte (Verbauchbares)',
+				yield_crafting: 'Produkte (Crafting)',
+				yield_mapdrop: 'Produkte (findbar)',
+				yield_other: 'Produkte (andere)',
+				sorting: 'Sortierung',
+				level: 'Level',
+				weapon: 'Waffe',
+				
+			},
+		}
+    };
+	
+    ItemInspector = {
+		name: 'Item Inspector',
+		sortedSets: {},
+		currentSetArray: {},
+		sortFunction: '',
+		level: 150,
+        Images: {
+			settings: 'data:image/png;base64,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',
+		},
+		updateLang: function () {
+			var lg = ItemInspectorStart.langs;
+			ItemInspector.lang = lg[Game.locale.substr(0, 2)] ? Game.locale.substr(0, 2)  : 'en';
+			ItemInspectorLang = lg[ItemInspector.lang];
+        },
+    };
+	
+	ItemInspector.updateLang();
+    ItemInspector.Skript = {
+        init: function () {
+			ItemInspector.sortedSets = west.storage.ItemSetManager.getAll().slice(0).sort(function (a, b) {
+			  return (a.name.toLowerCase() == b.name.toLowerCase()) ? 0 : (a.name.toLowerCase() > b.name.toLowerCase()) ? 1 :  - 1;
+			});
+			
+			ItemInspector.sortedSets_time = west.storage.ItemSetManager._setArray.reverse();
+			
+			var menuContainer = $('<div class="menulink" onclick="ItemInspector.GUI.openItemInspectorWindow();" title="' + 'Item Inspector' + '" />').css('background-image', 'url(' + ItemInspector.Images.settings + ')').css('background-position', '0px 0px').mouseenter(function () {
+            $(this).css('background-position', '-25px 0px');
+          }).mouseleave(function () {
+            $(this).css('background-position', '0px 0px');
+          });
+          $('#ui_menubar').append($('<div id="itemInspector_menubutton" class="ui_menucontainer" />').append(menuContainer).append('<div class="menucontainer_bottom" />'));
+        },
+		
+    };
+    
+	ItemInspector.GUI = {
+		openItemInspectorWindow: function () {
+			
+			ItemInspector.GUI.SetTab = {};
+			ItemInspector.GUI.ComparisonTab ={};
+			
+			ItemInspector.GUI.open();
+            ItemInspector.GUI.openItemTab();
+		},
+		open: function () {
+			ItemInspector.GUI.inspectorWindow = wman.open('Item_Inspector', 'The West - Item Inspector', 'noreload').setMiniTitle('Item Inspector').setMaxSize(1268, 838);
+			ItemInspector.GUI.inspectorWindow.addTab('Items', 'Item_Inspector_Items_Tab', ItemInspector.GUI.openItemTab);
+			ItemInspector.GUI.inspectorWindow.addTab('Sets', 'Item_Inspector_Sets_Tab', ItemInspector.GUI.openSetTab);
+			ItemInspector.GUI.inspectorWindow.addTab('Vergleich', 'Item_Inspector_Comparison_Tab', ItemInspector.GUI.openComparisonTab);
+        },
+        getDefault: function (tab) {
+			ItemInspector.GUI.inspectorWindow.setResizeable(false).setSize(748, 471).clearContentPane().removeClass('nocloseall').setTitle('Item Inspector');
+			ItemInspector.GUI.inspectorWindow.dontCloseAll = false;
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).css('margin-top', '10px');
+			var wnd = ItemInspector.GUI.inspectorWindow.getMainDiv();
+			$('.textart_title', wnd).css('display', '');
+			ItemInspector.GUI.inspectorWindow.activateTab(tab);
+        },
+		openItemTab: function () {
+			ItemInspector.GUI.getDefault('Item_Inspector_Items_Tab');
+			ItemInspector.GUI.ItemTab = {};
+			//ItemInspector.GUI.ItemTab.Scrollpane = new west.gui.Scrollpane();
+			
+			if(ItemInspector.allItems == undefined){
+				ItemInspector.GUI.collectItems();
+			}
+			
+
+			/*$(ItemInspector.GUI.ItemTab.Scrollpane.getMainDiv()).css({
+				'height': '92%'
+			});*/
+
+			ItemInspector.GUI.ItemTab.itemCategory = new west.gui.Combobox();
+			ItemInspector.GUI.ItemTab.itemCategory.setWidth(200);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('all', ItemInspectorLang.all);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('head', ItemInspectorLang.head);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('neck', ItemInspectorLang.neck);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('body', ItemInspectorLang.body);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('foot', ItemInspectorLang.foot);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('pants', ItemInspectorLang.pants);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('belt', ItemInspectorLang.belt);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('right_arm', ItemInspectorLang.right_arm);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('left_arm', ItemInspectorLang.left_arm);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('animal', ItemInspectorLang.animal);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('yield', ItemInspectorLang.yield);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('recipe', ItemInspectorLang.recipe);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('collection', ItemInspectorLang.collection);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('yield_buffuse', ItemInspectorLang.yield_buffuse);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('yield_crafting', ItemInspectorLang.yield_crafting);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('yield_mapdrop', ItemInspectorLang.yield_mapdrop);
+			ItemInspector.GUI.ItemTab.itemCategory.addItem('yield_other', ItemInspectorLang.yield_other);
+			ItemInspector.GUI.ItemTab.itemCategory.select('all');
+			ItemInspector.GUI.ItemTab.itemCategory.addListener(function(val){
+				//ItemInspector.GUI.ItemTab.Scrollpane.contentPane.empty();
+	
+				
+				
+				ItemInspector.GUI.display('id_desc');
+				/*var contentstring = '<table border="1" style="width: 100%;-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;user-select: text;"><tr><th>Name</th><th>ID</th><th>Anzahl im Inventar</th></tr>';
+				$.each(currArray, function(index, item_obj) {
+					var level = ItemInspector.GUI.ItemTab.LevelTextfield.getValue();
+					if(!isNaN(parseFloat(level)) && isFinite(level)){
+						ItemInspector.Sets.level = level;
+					} else {
+						ItemInspector.GUI.ItemTab.LevelTextfield.setValue(150);
+						ItemInspector.Sets.level = 150;
+					}
+					var popup = new ItemPopup(item_obj,{
+						character:{level:ItemInspector.Sets.level}
+					}).popup
+					
+					contentstring += '<tr><td style="text-align: center;"><a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + popup.getXHTML().escapeHTML() + '"> ' + item_obj.name + ' </a></td><td style="text-align: center;"> ' + item_obj.item_id + ' </td><td style="text-align: center;"> ' + Bag.getItemCount(item_obj.item_id) + ' </td></tr>';
+				});
+				contentstring += '</table>';*/
+				
+				
+
+				
+
+
+				
+
+
+				
+				
+				/*var contentstring ='';
+				$.each(myOjects, function(index, item_obj) {
+					if(item_obj.type == itemCategory.getValue()){
+						var popup = new ItemPopup(item_obj);
+						if(Bag.getItemCount(item_obj.item_id) > 0) {
+							contentstring += '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + popup.getXHTML().escapeHTML() + '">' + item_obj.name + '</a> <b>ID: ' + item_obj.item_id + '</b> Im Inventar: ' + Bag.getItemCount(item_obj.item_id) + '<br>';
+							//contentstring += '<div class="item item_inventory" title="' + popup.getXHTML().escapeHTML() + '">'+item_obj.name+'</div>';
+							//contentstring += '<div class="item item_inventory" title="' + popup.getXHTML().escapeHTML() + '"><img width="53" height="53" src="' + item_obj.image + '" class="tw_item item_inventory_img dnd_draggable dnd_dragElem" style="margin-left:3px;margin-top:4px;"><span class="count" style="display: block;"><p>'+Bag.getItemCount(item_obj.item_id)+'</p></span></div>';
+						} else {
+							contentstring += '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + popup.getXHTML().escapeHTML() + '">' + item_obj.name + '</a> <b>ID: ' + item_obj.item_id + '</b> Im Inventar: ' + Bag.getItemCount(item_obj.item_id) + '<br>';
+							//contentstring += '<div style="opacity:0.35" class="item item_inventory" title="' + popup.getXHTML().escapeHTML() + '"><img width="53" height="53" src="' + item_obj.image + '" class="tw_item item_inventory_img dnd_draggable dnd_dragElem" style="margin-left:3px;margin-top:4px;"></div>';
+						}
+						array.push(item_obj);
+					} else if (!(item_obj.type == 'head') && !(item_obj.type == 'neck') && !(item_obj.type == 'body') && !(item_obj.type == 'foot') && !(item_obj.type == 'pants') && !(item_obj.type == 'belt') && !(item_obj.type == 'right_arm') && !(item_obj.type == 'left_arm') && !(item_obj.type == 'animal') && !(item_obj.type == 'recipe') && !(item_obj.type == 'collection')){
+						if((itemCategory.getValue() == 'yield_buffuse' && item_obj.usetype == 'buff') || (itemCategory.getValue() == 'yield_buffuse' && item_obj.usetype == 'use')){
+							var popup = new ItemPopup(item_obj);
+						  contentstring += '<div class="item item_inventory" title="' + popup.getXHTML().escapeHTML() + '"><img width="53" height="53" src="' + item_obj.image + '" class="tw_item item_inventory_img dnd_draggable dnd_dragElem" style="margin-left:3px;margin-top:4px;"></div>';
+						  array.push(item_obj);
+						} else if(itemCategory.getValue() == 'yield_mapdrop' && item_obj.usetype == 'none' && item_obj.spec_type == 'mapdrop'){
+							var popup = new ItemPopup(item_obj);
+						  contentstring += '<div class="item item_inventory" title="' + popup.getXHTML().escapeHTML() + '"><img width="53" height="53" src="' + item_obj.image + '" class="tw_item item_inventory_img dnd_draggable dnd_dragElem" style="margin-left:3px;margin-top:4px;"></div>';
+						  array.push(item_obj);
+						} else if(itemCategory.getValue() == 'yield_crafting' && item_obj.usetype == 'none' && item_obj.spec_type == 'crafting'){
+							var popup = new ItemPopup(item_obj);
+						  contentstring += '<div class="item item_inventory" title="' + popup.getXHTML().escapeHTML() + '"><img width="53" height="53" src="' + item_obj.image + '" class="tw_item item_inventory_img dnd_draggable dnd_dragElem" style="margin-left:3px;margin-top:4px;"></div>';
+						  array.push(item_obj);
+						} else if(itemCategory.getValue() == 'yield_other' && item_obj.type == 'yield'){
+							if(!(item_obj.spec_type == 'mapdrop') && !(item_obj.usetype == 'buff') && !(item_obj.usetype == 'use') && !(item_obj.spec_type == 'crafting')){
+								var popup = new ItemPopup(item_obj);
+								contentstring += '<div class="item item_inventory" title="' + popup.getXHTML().escapeHTML() + '"><img width="53" height="53" src="' + item_obj.image + '" class="tw_item item_inventory_img dnd_draggable dnd_dragElem" style="margin-left:3px;margin-top:4px;"></div>';
+								array.push(item_obj);
+							}
+						}
+					}
+				});
+				for (var c = 0; c <= (array.length - array.length  % 11) / 11; c++) {
+					contentstring += array.length == 0 ? "<br/>" : "<br/><br/><br/><br/>";
+				}*/
+				
+				
+				/*var contentstring = '<table border="1" style="width: 100%;-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;user-select: text;"><tr><th>Name</th><th>ID</th><th>Anzahl im Inventar</th></tr>';
+				$.each(myOjects, function(index, item_obj) {
+					if(item_obj.type == itemCategory.getValue()){
+						var popup = new ItemPopup(item_obj);
+						contentstring += '<tr><td style="text-align: center;"><a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + popup.getXHTML().escapeHTML() + '"> ' + item_obj.name + ' </a></td><td style="text-align: center;"> ' + item_obj.item_id + ' </td><td style="text-align: center;"> ' + Bag.getItemCount(item_obj.item_id) + ' </td></tr>';
+						array.push(item_obj);
+					} else if (!(item_obj.type == 'head') && !(item_obj.type == 'neck') && !(item_obj.type == 'body') && !(item_obj.type == 'foot') && !(item_obj.type == 'pants') && !(item_obj.type == 'belt') && !(item_obj.type == 'right_arm') && !(item_obj.type == 'left_arm') && !(item_obj.type == 'animal') && !(item_obj.type == 'recipe') && !(item_obj.type == 'collection')){
+						if((itemCategory.getValue() == 'yield_buffuse' && item_obj.usetype == 'buff') || (itemCategory.getValue() == 'yield_buffuse' && item_obj.usetype == 'use')){
+							var popup = new ItemPopup(item_obj);
+						  contentstring += '<div class="item item_inventory" title="' + popup.getXHTML().escapeHTML() + '"><img width="53" height="53" src="' + item_obj.image + '" class="tw_item item_inventory_img dnd_draggable dnd_dragElem" style="margin-left:3px;margin-top:4px;"></div>';
+						  array.push(item_obj);
+						} else if(itemCategory.getValue() == 'yield_mapdrop' && item_obj.usetype == 'none' && item_obj.spec_type == 'mapdrop'){
+							var popup = new ItemPopup(item_obj);
+						  contentstring += '<div class="item item_inventory" title="' + popup.getXHTML().escapeHTML() + '"><img width="53" height="53" src="' + item_obj.image + '" class="tw_item item_inventory_img dnd_draggable dnd_dragElem" style="margin-left:3px;margin-top:4px;"></div>';
+						  array.push(item_obj);
+						} else if(itemCategory.getValue() == 'yield_crafting' && item_obj.usetype == 'none' && item_obj.spec_type == 'crafting'){
+							var popup = new ItemPopup(item_obj);
+						  contentstring += '<div class="item item_inventory" title="' + popup.getXHTML().escapeHTML() + '"><img width="53" height="53" src="' + item_obj.image + '" class="tw_item item_inventory_img dnd_draggable dnd_dragElem" style="margin-left:3px;margin-top:4px;"></div>';
+						  array.push(item_obj);
+						} else if(itemCategory.getValue() == 'yield_other' && item_obj.type == 'yield'){
+							if(!(item_obj.spec_type == 'mapdrop') && !(item_obj.usetype == 'buff') && !(item_obj.usetype == 'use') && !(item_obj.spec_type == 'crafting')){
+								var popup = new ItemPopup(item_obj);
+								contentstring += '<div class="item item_inventory" title="' + popup.getXHTML().escapeHTML() + '"><img width="53" height="53" src="' + item_obj.image + '" class="tw_item item_inventory_img dnd_draggable dnd_dragElem" style="margin-left:3px;margin-top:4px;"></div>';
+								array.push(item_obj);
+							}
+						}
+					}
+				});*/
+				
+				
+				
+				
+			
+			});
+
+			
+			ItemInspector.GUI.ItemTab.LevelTextfield = new west.gui.Textfield('item_tab_level_textfield').setSize(2).setValue(150);
+			
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append('<b>' + ItemInspectorLang.level + ': </b>');
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.ItemTab.LevelTextfield.getMainDiv());
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.ItemTab.itemCategory.getMainDiv());	
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append('<div id="item_display" style="overflow-y: auto; height: 330px; max-height: 330px;"></div>');			
+		},
+		
+		showPopup: function(item_id) {
+			var item_obj = ItemManager.get(item_id);
+			console.log(item_obj);
+			var popup = new ItemPopup(item_obj,{
+				character:{level:150}
+			}).popup;
+			console.log(popup.getXHTML());
+		},
+		
+		display: function(sort) {
+			var currArray = ItemInspector.allItems[ItemInspector.GUI.ItemTab.itemCategory.getValue()];
+			
+			var contentstring = '<table border="1" style="width: 100%;-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;user-select: text;"><tr><th>Name</th><th>ID</th><th>Anzahl im Inventar</th></tr>';
+
+			$.each(currArray, function(index, item_obj) {
+				  /*var popup = new ItemPopup(item_obj,{
+					character:{level:150}
+				  }).popup
+				  contentstring += '<tr><td style="text-align: center;"><a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + popup.getXHTML().escapeHTML() + '"> ' + item_obj.name + ' </a></td><td style="text-align: center;"> ' + item_obj.item_id + ' </td><td style="text-align: center;"> ' + Bag.getItemCount(item_obj.item_id) + ' </td></tr>';
+				  */
+				  //contentstring += '<tr><td style="text-align: center;"><a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + (new ItemPopup(item_obj,{character:{level:150}}).popup).getXHTML().escapeHTML() + '"> ' + item_obj.name + ' </a></td><td style="text-align: center;"> ' + item_obj.item_id + ' </td><td style="text-align: center;"> ' + Bag.getItemCount(item_obj.item_id) + ' </td></tr>';
+				  
+				  contentstring += '<tr><td style="text-align: center;">' + item_obj.name + '</td><td style="text-align: center;"> ' + item_obj.item_id + ' </td><td style="text-align: center;"> ' + Bag.getItemCount(item_obj.item_id) + ' </td></tr>';
+			
+				//contentstring += '<tr><td style="text-align: center;"><a class="itemlink hasMousePopup" onclick="ItemInspector.GUI.showPopup('+item_obj.item_id+')">' + item_obj.name + ' </a></td><td style="text-align: center;"> ' + item_obj.item_id + ' </td><td style="text-align: center;"> ' + Bag.getItemCount(item_obj.item_id) + ' </td></tr>';
+				//contentstring += '<tr><td style="text-align: center;"><a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + (new ItemPopup(item_obj,{character:{level:150}}).popup).getXHTML().replace(/<img[^>]*>/g,"").escapeHTML() + '"> ' + item_obj.name + ' </a></td><td style="text-align: center;"> ' + item_obj.item_id + ' </td><td style="text-align: center;"> ' + Bag.getItemCount(item_obj.item_id) + ' </td></tr>';
+				  
+			
+			});
+			
+			contentstring+= '</table>';
+			
+			/*var thAmount = $('<a style="cursor: pointer;">Amount</a>').click(function(){ ItemInspector.GUI.display(sort == 'amount' ? 'amount_desc' : 'amount'); return false; });
+			var thId = $('<a style="cursor: pointer;">Id</a>').click(function(){ ItemInspector.GUI.display(sort == 'id' ? 'id_desc' : 'id'); return false; });
+			var thName = $('<a style="cursor: pointer;">Name</a>').click(function(){ ItemInspector.GUI.display(sort == 'name' ? 'name_desc' : 'name'); return false; });
+			
+			var mytable = new west.gui.Table().setId('ItemInspector_item_table')
+			.addColumn("ItemInspector_item_name")
+			.addColumn("ItemInspector_item_id")
+			.addColumn("ItemInspector_item_amount")
+			.appendToCell("head", "ItemInspector_item_name", thName)
+			.appendToCell("head", "ItemInspector_item_id", thId)
+			.appendToCell("head", "ItemInspector_item_amount", thAmount);
+			
+			switch(sort) {
+				case "amount" 	:	currArray.sort(this.sortByAmount); break;
+				case "amount_desc":	currArray.sort(this.sortByAmount).reverse(); break;
+				case "id" 	:	currArray.sort(this.sortById); break;
+				case "id_desc"	:	currArray.sort(this.sortById).reverse(); break;
+				case "name_desc"	:	currArray.sort(this.sortByName).reverse(); break;
+				case "name"	:
+				default		:	sort = "name"; currArray.sort(this.sortByName);
+			}
+			
+			$.each(currArray, function(index, item_obj) {
+				  var popup = new ItemPopup(item_obj,{
+					character:{level:150}
+				  }).popup
+				  mytable.appendRow(null, 'hiroFriendRow_'+index)
+										.appendToCell(-1, "ItemInspector_item_name", '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + popup.getXHTML().escapeHTML() + '">' + item_obj.name + '</a>')
+										.appendToCell(-1, "ItemInspector_item_id", item_obj.item_id)
+										.appendToCell(-1, "ItemInspector_item_amount", Bag.getItemCount(item_obj.item_id));
+			});
+			
+			
+
+			var styling = $('<style></style>').text('.remove-link { width:20px; } .ItemInspector_item_name { width:400px; } .ItemInspector_item_id { text-align:center; width:100px; } .ItemInspector_item_amount { text-align:right; width:100px }');
+			$('head').append(styling);*/
+			
+			/*ItemInspector.GUI.ItemTab.Scrollpane.contentPane.empty();
+			//ItemInspector.GUI.ItemTab.Scrollpane.appendContent(mytable.getMainDiv());
+			ItemInspector.GUI.ItemTab.Scrollpane.appendContent(contentstring);
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.ItemTab.Scrollpane.getMainDiv());
+			$('#ItemInspector_item_table > div.trows > div.tbody > div.tw2gui_scrollpane').css({'height': '250px'});
+			
+			ItemInspector.GUI.ItemTab.Scrollpane.scrollToTop();*/
+			
+			$('#item_display').html(contentstring);
+		},
+		
+		collectItems: function() {
+			var myOjects = ItemManager.getAll();
+			
+			ItemInspector.allItems = {
+				all: [],
+				head: [],
+				neck: [],
+				body: [],
+				foot: [],
+				pants: [],
+				belt: [],
+				right_arm: [],
+				left_arm: [],
+				animal: [],
+				collection: [],
+				recipe: [],
+				yield_buffuse: [],
+				yield_crafting: [],
+				yield_mapdrop: [],
+				yield_other: [],
+			}
+			
+			$.each(myOjects, function(index, item_obj) {
+				if(item_obj.type == 'yield'){
+					if(item_obj.usetype == 'buff' || item_obj.usetype == 'use'){
+						ItemInspector.allItems['yield_buffuse'].push(item_obj);
+					} else if(item_obj.usetype == 'none' && item_obj.spec_type == 'mapdrop'){
+						ItemInspector.allItems['yield_mapdrop'].push(item_obj);
+					} else if(item_obj.usetype == 'none' && item_obj.spec_type == 'crafting'){
+						ItemInspector.allItems['yield_crafting'].push(item_obj);
+					} else {
+						ItemInspector.allItems['yield_other'].push(item_obj);
+					}
+				} else {
+					ItemInspector.allItems[item_obj.type].push(item_obj);
+				}
+				ItemInspector.allItems['all'].push(item_obj);
+			});
+			console.log('all items collected');
+		},
+		
+		sortByAmount: function(a, b) { return Bag.getItemCount(b.item_id) - Bag.getItemCount(a.item_id); },
+		sortById: function(a, b) { return a.item_id - b.item_id; },
+		sortByName: function(a, b) { return a.name.toLowerCase().localeCompare(b.name.toLowerCase()); },
+		
+		openSetTab: function () {
+			ItemInspector.GUI.getDefault('Item_Inspector_Sets_Tab');
+			ItemInspector.GUI.featScroll = new west.gui.Scrollpane();
+			ItemInspector.Sets.clearBoni();
+			
+			ItemInspector.GUI.SetTab.SortFunctionCombobox = new west.gui.Combobox();
+			ItemInspector.GUI.SetTab.SortFunctionCombobox.setWidth(130);
+			ItemInspector.GUI.SetTab.SortFunctionCombobox.addItem('sortByTime', ItemInspectorLang.sortByTime);
+			ItemInspector.GUI.SetTab.SortFunctionCombobox.addItem('sortByName', ItemInspectorLang.sortByName);
+			ItemInspector.GUI.SetTab.SortFunctionCombobox.select('sortByTime');
+			
+			ItemInspector.GUI.SelectSetButton = new west.gui.Button(ItemInspectorLang.selectSet, function () {
+				ItemInspector.GUI.featScroll.contentPane.empty();
+				
+				ItemInspector.level = ItemInspector.GUI.SetTab.LevelTextfield.getValue();
+				if(!isNaN(parseFloat(level)) && isFinite(level)){
+					ItemInspector.Sets.level = level;
+				} else {
+					ItemInspector.GUI.SetTab.LevelTextfield.setValue(150);
+				}
+				
+				if(ItemInspector.GUI.SetTab.SortFunctionCombobox.getValue() == 'sortByName'){
+					ItemInspector.currentSetArray = ItemInspector.sortedSets;
+				} else {
+					ItemInspector.currentSetArray = ItemInspector.sortedSets_time;
+				}
+				
+				ItemInspector.GUI.setlist = new west.gui.Selectbox().setWidth(250);
+				ItemInspector.currentSetArray.each(function (set, index) {
+					ItemInspector.GUI.setlist.addItem(index,'<div style="padding-right: 20px; text-overflow:ellipsis; white-space:nowrap; overflow:hidden;">' + set.name + '</div>', set.name);
+				});
+				ItemInspector.GUI.setlist.addListener(ItemInspector.GUI.clear);
+				
+				//active_tab_id_Item_Inspector_Sets_Tab
+				var position = $('div#mybuttonid').offset();
+				
+				ItemInspector.GUI.setlist.divWrap.position(position);
+				ItemInspector.GUI.setlist.divWrap.css('position', 'absolute');
+				ItemInspector.GUI.setlist.divWrap.css('left', position.left);
+				ItemInspector.GUI.setlist.divWrap.css('top', position.top+35);
+				ItemInspector.GUI.setlist.show();
+				
+				$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.featScroll.getMainDiv());
+			});
+			ItemInspector.GUI.SelectSetButton.divMain.id = 'mybuttonid';
+			
+			
+			
+			
+			ItemInspector.GUI.SetTab.ShotAndHandCombobox = new west.gui.Combobox();
+			ItemInspector.GUI.SetTab.ShotAndHandCombobox.addItem('hand_comboitem', ItemInspectorLang.hand_weapon);
+			ItemInspector.GUI.SetTab.ShotAndHandCombobox.addItem('shot_comboitem', ItemInspectorLang.shot_weapon);
+			ItemInspector.GUI.SetTab.ShotAndHandCombobox.select('hand_comboitem');
+			ItemInspector.GUI.right_arm = 'hand';
+			ItemInspector.GUI.SetTab.ShotAndHandCombobox.addListener(function(val){
+				if(val == 'hand_comboitem'){
+					ItemInspector.GUI.right_arm = 'hand';
+				} else {
+					ItemInspector.GUI.right_arm = 'shot';
+				}
+				
+			});
+			
+			ItemInspector.GUI.SetTab.LevelTextfield = new west.gui.Textfield('set_tab_level_textfield').setSize(2).setValue(150);
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append('<b>' + ItemInspectorLang.sorting + ': </b>');
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.SetTab.SortFunctionCombobox.getMainDiv());
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append('<b> ' + ItemInspectorLang.weapon + ': </b>');
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.SetTab.ShotAndHandCombobox.getMainDiv());
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append('<b> ' + ItemInspectorLang.level + ': </b>');
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.SetTab.LevelTextfield.getMainDiv());
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.SelectSetButton.getMainDiv());				
+		},
+		
+		openComparisonTab: function() {
+			ItemInspector.GUI.getDefault('Item_Inspector_Comparison_Tab');
+			
+			
+			
+			ItemInspector.Sets.clearBoni();
+			
+			ItemInspector.GUI.ComparisonTab.SortFunctionCombobox = new west.gui.Combobox();
+			ItemInspector.GUI.ComparisonTab.SortFunctionCombobox.setWidth(130);
+			ItemInspector.GUI.ComparisonTab.SortFunctionCombobox.addItem('sortByTime', ItemInspectorLang.sortByTime);
+			ItemInspector.GUI.ComparisonTab.SortFunctionCombobox.addItem('sortByName', ItemInspectorLang.sortByName);
+			ItemInspector.GUI.ComparisonTab.SortFunctionCombobox.select('sortByTime');
+			
+			ItemInspector.GUI.ComparisonTab.ShotAndHandCombobox = new west.gui.Combobox();
+			ItemInspector.GUI.ComparisonTab.ShotAndHandCombobox.addItem('hand_comboitem', ItemInspectorLang.hand_weapon);
+			ItemInspector.GUI.ComparisonTab.ShotAndHandCombobox.addItem('shot_comboitem', ItemInspectorLang.shot_weapon);
+			ItemInspector.GUI.ComparisonTab.ShotAndHandCombobox.select('hand_comboitem');
+			ItemInspector.GUI.right_arm = 'hand';
+			ItemInspector.GUI.ComparisonTab.ShotAndHandCombobox.addListener(function(val){
+				if(val == 'hand_comboitem'){
+					ItemInspector.GUI.right_arm = 'hand';
+				} else {
+					ItemInspector.GUI.right_arm = 'shot';
+				}
+				
+			});
+			
+			ItemInspector.GUI.ComparisonTab.LevelTextfield = new west.gui.Textfield('comparision_tab_level_textfield').setSize(2).setValue(150);
+			
+			ItemInspector.GUI.ComparisonTab.Set1Button = new west.gui.Button(ItemInspectorLang.selectSet, function () {
+				ItemInspector.GUI.showComparisonSetList('ItemInspectorGUIComparisonTabSet1Button');
+			});
+			ItemInspector.GUI.ComparisonTab.Set1Button.divMain.style.width = '50%'
+			ItemInspector.GUI.ComparisonTab.Set1Button.divMain.id = 'ItemInspectorGUIComparisonTabSet1Button';
+			
+			ItemInspector.GUI.ComparisonTab.Set2Button = new west.gui.Button(ItemInspectorLang.selectSet, function () {
+				ItemInspector.GUI.showComparisonSetList('ItemInspectorGUIComparisonTabSet2Button');
+			});
+			ItemInspector.GUI.ComparisonTab.Set2Button.divMain.style.float = 'right'
+			ItemInspector.GUI.ComparisonTab.Set2Button.divMain.style.width = '50%'
+			ItemInspector.GUI.ComparisonTab.Set2Button.divMain.id = 'ItemInspectorGUIComparisonTabSet2Button';
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append('<b>' + ItemInspectorLang.sorting + ': </b>');
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.ComparisonTab.SortFunctionCombobox.getMainDiv());
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append('<b> ' + ItemInspectorLang.weapon + ': </b>');
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.ComparisonTab.ShotAndHandCombobox.getMainDiv());
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append('<b> ' + ItemInspectorLang.level + ': </b>');
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.ComparisonTab.LevelTextfield.getMainDiv());
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append('<br>');
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.ComparisonTab.Set1Button.getMainDiv());
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.ComparisonTab.Set2Button.getMainDiv());
+			ItemInspector.GUI.ComparisonTab.Scrollpane = new west.gui.Scrollpane();
+			$(ItemInspector.GUI.ComparisonTab.Scrollpane.getMainDiv()).css({
+				'height': '84%'
+			});
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.ComparisonTab.Scrollpane.getMainDiv());
+			
+		},
+		
+		showComparisonSetList: function(buttonId){
+			
+			ItemInspector.GUI.ComparisonTab.Setlist = new west.gui.Selectbox().setWidth(250);
+			
+			if(ItemInspector.GUI.ComparisonTab.SortFunctionCombobox.getValue() == 'sortByName'){
+				ItemInspector.currentSetArray = ItemInspector.sortedSets;
+			} else {
+				ItemInspector.currentSetArray = ItemInspector.sortedSets_time;
+			}
+			
+			ItemInspector.currentSetArray.each(function (set, index) {
+				ItemInspector.GUI.ComparisonTab.Setlist.addItem(index,'<div style="padding-right: 20px; text-overflow:ellipsis; white-space:nowrap; overflow:hidden;">' + set.name + '</div>', set.name);
+			});
+			ItemInspector.GUI.ComparisonTab.Setlist.addListener(ItemInspector.GUI.addComparisonSet);
+			
+			
+			var position = $('div#'+ buttonId).offset();
+			ItemInspector.GUI.ComparisonTab.Setlist.divWrap.position(position);
+			ItemInspector.GUI.ComparisonTab.Setlist.divWrap.css('position', 'absolute');
+			ItemInspector.GUI.ComparisonTab.Setlist.divWrap.css('left', position.left);
+			ItemInspector.GUI.ComparisonTab.Setlist.divWrap.css('top', position.top+35);
+			ItemInspector.GUI.ComparisonTab.ActivButton = buttonId;
+			ItemInspector.GUI.ComparisonTab.Setlist.show();
+		},
+		
+		addComparisonSet: function(set_id){
+			ItemInspector.GUI.ComparisonTab.Scrollpane.contentPane.empty();
+			var name = ItemInspector.currentSetArray[set_id].name;
+			switch(ItemInspector.GUI.ComparisonTab.ActivButton) {
+				case 'ItemInspectorGUIComparisonTabSet1Button':
+					ItemInspector.GUI.ComparisonTab.Set1Button.setCaption(name);
+					ItemInspector.GUI.ComparisonTab.Set1Id = set_id;
+					break;
+				case 'ItemInspectorGUIComparisonTabSet2Button':
+					ItemInspector.GUI.ComparisonTab.Set2Button.setCaption(name);
+					ItemInspector.GUI.ComparisonTab.Set2Id = set_id;
+					break;
+			}
+			
+			if(ItemInspector.GUI.ComparisonTab.Set1Id != undefined && ItemInspector.GUI.ComparisonTab.Set2Id != undefined) {
+				var insert = '<table border="1" style="width: 100%;-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;user-select: text;">';
+
+				ItemInspector.Sets.clearBoni();
+				var level = ItemInspector.GUI.ComparisonTab.LevelTextfield.getValue();
+				if(!isNaN(parseFloat(level)) && isFinite(level)){
+					ItemInspector.Sets.level = level;
+				} else {
+					ItemInspector.GUI.ComparisonTab.LevelTextfield.setValue(150);
+				}
+				
+				//Set 1
+				var set = ItemInspector.currentSetArray[ItemInspector.GUI.ComparisonTab.Set1Id];
+				//GetItemText + AddItemToTotal
+				ItemInspector.Sets.getItems(set.items);
+				//Add Total Set Bonus
+				ItemInspector.Sets.addTotalSetBonus(set);
+				insert += '<tr><td style="width: 51%;"><b>SetBoni + Items:</b><br>';
+				//Total Result
+				insert += ItemInspector.GUI.getTotalResult();
+				insert += '</td>';
+				
+				ItemInspector.Sets.boni2 = ItemInspector.Sets.boni;
+				ItemInspector.Sets.clearBoni();
+				
+				//Set 2
+				var set = ItemInspector.currentSetArray[ItemInspector.GUI.ComparisonTab.Set2Id];
+				//GetItemText + AddItemToTotal
+				ItemInspector.Sets.getItems(set.items);
+				//Add Total Set Bonus
+				ItemInspector.Sets.addTotalSetBonus(set);
+				insert += '<td><b>SetBoni + Items:</b><br>';
+				//Total Result
+				insert += ItemInspector.GUI.getTotalResult();
+				insert += '</td>';
+				insert += '</tr>';
+				
+				
+				insert += '<tr>';
+				insert += '<td>';
+				insert += ItemInspector.GUI.getComparison(ItemInspector.Sets.boni2,ItemInspector.Sets.boni);
+				insert += '</td>';
+				insert += '<td>';
+				insert += ItemInspector.GUI.getComparison(ItemInspector.Sets.boni,ItemInspector.Sets.boni2);
+				insert += '</td>';
+				insert += '</tr>';
+				insert += ItemInspector.GUI.getTotalPoints(ItemInspector.Sets.boni2,ItemInspector.Sets.boni);
+				insert += '</table>';
+				
+				ItemInspector.GUI.ComparisonTab.Set1Id = undefined;
+				ItemInspector.GUI.ComparisonTab.Set2Id = undefined;
+				ItemInspector.GUI.ComparisonTab.Scrollpane.appendContent('<br>');
+				ItemInspector.GUI.ComparisonTab.Scrollpane.appendContent(insert);
+				$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.ComparisonTab.Scrollpane.getMainDiv());
+				ItemInspector.GUI.ComparisonTab.Scrollpane.scrollToTop();
+			}
+			
+		},
+		
+		getTotalResult: function(){
+			var insert = '';
+			for (var attribute_name in ItemInspector.Sets.boni) {
+				if (ItemInspector.Sets.boni.hasOwnProperty(attribute_name) && ItemInspector.Sets.boni[attribute_name] > 0 && attribute_name != 'undefined' && attribute_name != 'jobs') {
+					var skill_name = CharacterSkills.keyNames[attribute_name];
+					if(skill_name != undefined){
+						insert += '+ ' + ItemInspector.Sets.boni[attribute_name] + ' ' + skill_name + '<br>';
+					} else {
+						insert += '+ ' + ItemInspector.Sets.boni[attribute_name];
+						if(attribute_name == 'experience' || attribute_name == 'luck' || attribute_name == 'dollar' || attribute_name == 'speed' || attribute_name == 'regen'){
+							insert += '%';
+						}
+						insert += ' ' + ItemInspectorLang[attribute_name] + '<br>';
+					}
+					
+				}
+			}
+			for (var i=0; i<ItemInspector.Sets.boni.jobs.length; i++) {
+				insert += '+ ' + ItemInspector.Sets.boni.jobs[i] + '<br>';
+			}
+			return insert;
+		},
+		
+		getComparison: function(boni1, boni2){
+			var color = 'green';
+			var insert = '';
+			for (var attribute_name in boni1) {
+				if(boni1[attribute_name] !=  0 || boni2[attribute_name] !=  0){
+					if (boni1.hasOwnProperty(attribute_name) && attribute_name != 'undefined' && attribute_name != 'jobs') {
+						var skill_name = CharacterSkills.keyNames[attribute_name];
+						if(boni1[attribute_name] > boni2[attribute_name]){
+							color = 'green';
+						} else if(boni1[attribute_name] == boni2[attribute_name]){
+							color = 'black'
+						} else {
+							color = 'red';
+						}
+						if(skill_name != undefined){
+							insert += '<span style="color: ' + color + ';">+ ' + boni1[attribute_name] + ' ' + skill_name + '</span><br>';
+						} else {
+							insert += '<span style="color: ' + color + ';">+ ' + boni1[attribute_name];
+							if(attribute_name == 'experience' || attribute_name == 'luck' || attribute_name == 'dollar' || attribute_name == 'speed' || attribute_name == 'regen'){
+								insert += '%';
+							}
+							insert += ' ' + ItemInspectorLang[attribute_name] + '</span><br>';
+						}
+						
+					}
+				}
+			}
+			
+			
+			
+			for (var i=0; i<boni1.jobs.length; i++) {
+				insert += '+ ' + boni1.jobs[i] + '<br>';
+			}
+			
+			return insert;
+		},
+		
+		getTotalPoints: function(boni1, boni2){
+			var insert = '';
+			var attributePoints1 = 0;
+			var skillPoints1 = 0;
+			var attributePoints2 = 0;
+			var skillPoints2 = 0;				
+			for (var attribute_name in boni1) {
+				if(boni1[attribute_name] !=  0 || boni2[attribute_name] !=  0){
+					if (boni1.hasOwnProperty(attribute_name) && attribute_name != 'undefined' && attribute_name != 'jobs') {
+						var skill_name = CharacterSkills.keyNames[attribute_name];
+						if(skill_name != undefined){
+							if(attribute_name == 'strength' || attribute_name == 'flexibility' || attribute_name == 'dexterity' || attribute_name == 'charisma'){
+								attributePoints1 += boni1[attribute_name];
+							} else {
+								skillPoints1 += boni1[attribute_name];
+							}
+						}
+					}
+					if (boni2.hasOwnProperty(attribute_name) && attribute_name != 'undefined' && attribute_name != 'jobs') {
+						var skill_name = CharacterSkills.keyNames[attribute_name];
+						if(skill_name != undefined){
+							if(attribute_name == 'strength' || attribute_name == 'flexibility' || attribute_name == 'dexterity' || attribute_name == 'charisma'){
+								attributePoints2 += boni2[attribute_name];
+							} else {
+								skillPoints2 += boni2[attribute_name];
+							}
+						}
+					}
+					
+				}
+			}
+			var color;
+			insert += '<tr><td>';
+			if(attributePoints1 > attributePoints2){
+				color = 'green';
+			} else if(attributePoints1 < attributePoints2){
+				color = 'red';
+			} else {
+				color = 'black'
+			}
+			insert += '<span style="color: ' + color + ';">'+ ItemInspectorLang.totalAttributePoints + ': ' + attributePoints1 + '</span><br>';
+			if(skillPoints1 > skillPoints2){
+				color = 'green';
+			} else if(skillPoints1 < skillPoints2){
+				color = 'red';
+			} else {
+				color = 'black'
+			}
+			insert += '<span style="color: ' + color + ';">'+ ItemInspectorLang.totalSkillPoints + ': ' + skillPoints1 + '</span><br>';
+			insert += '</td><td>';
+			if(attributePoints2 > attributePoints1){
+				color = 'green';
+			} else if(attributePoints2 < attributePoints1){
+				color = 'red';
+			} else {
+				color = 'black'
+			}
+			insert += '<span style="color: ' + color + ';">'+ ItemInspectorLang.totalAttributePoints + ': ' + attributePoints2 + '</span><br>';
+			if(skillPoints2 > skillPoints1){
+				color = 'green';
+			} else if(skillPoints2 < skillPoints1){
+				color = 'red';
+			} else {
+				color = 'black'
+			}
+			insert += '<span style="color: ' + color + ';">'+ ItemInspectorLang.totalSkillPoints + ': ' + skillPoints2 + '</span><br>';
+			insert += '</td></tr>';
+			return insert;
+		},
+		
+		clear: function (set_id) {
+			var level = ItemInspector.GUI.SetTab.LevelTextfield.getValue();
+			if(!isNaN(parseFloat(level)) && isFinite(level)){
+				ItemInspector.Sets.level = level;
+			} else {
+				ItemInspector.GUI.SetTab.LevelTextfield.setValue(150);
+			}
+			
+			$(ItemInspector.GUI.featScroll.getMainDiv()).css({
+				'margin-top': '5px',
+				'height': '92%'
+			});
+			
+			ItemInspector.GUI.featScroll.contentPane.empty();
+			
+			ItemInspector.Sets.clearBoni();
+			
+			var set = ItemInspector.currentSetArray[set_id];
+			
+			var set_items = set.items;
+			var insert = '<table border="1" style="-webkit-user-select: text;-moz-user-select: text;-ms-user-select: text;user-select: text;">';
+			
+			//GetItemText + AddItemToTotal
+			insert += ItemInspector.Sets.getItems(set_items, insert);
+			//GetSetText for Stages
+			insert += ItemInspector.Sets.getStageText(set_id);
+			//Add Total Set Bonus
+			ItemInspector.Sets.addTotalSetBonus(set);
+			insert += '<tr><td><b>SetBoni + Items:</b><br>';
+			//Total Result
+			insert += ItemInspector.GUI.getTotalResult(insert);
+			insert += '</td></tr>';
+			insert += '</table>';
+			
+			ItemInspector.GUI.featScroll.appendContent('<br>');
+			ItemInspector.GUI.featScroll.appendContent(insert);
+			$(ItemInspector.GUI.inspectorWindow.getContentPane()).append(ItemInspector.GUI.featScroll.getMainDiv());
+			//ItemInspector.GUI.featScroll.appendContent(insert);
+			ItemInspector.GUI.featScroll.scrollToTop();
+		},
+
+    };
+	
+		ItemInspector.Sets = {
+			
+			getItems: function(set_items){
+				var insert = '';
+				var hasShotAndHand = ItemInspector.Sets.testShotAndHand(set_items);
+				set_items.each(function (item_id, index) {
+					var item = ItemManager.getByBaseId(item_id);
+					var popup = new ItemPopup(ItemManager.getByBaseId(item_id),{
+						character:{level:ItemInspector.Sets.level}
+					}).popup
+					insert += '<tr><td><b>' + ItemManager.getByBaseId(item_id).name + '</b><br>ID: ' + item_id + '000<br>';
+					insert += '<a class="itemlink hasMousePopup" href="javascript:void(0)" title="' + popup.getXHTML().escapeHTML() + '"><img width="50" height="50" src="' + ItemManager.getByBaseId(item_id).image + '"></a><br>';
+					var mustAddToSum = true;
+					if (item.type == 'right_arm' && hasShotAndHand && (item.sub_type != ItemInspector.GUI.right_arm)) {
+						mustAddToSum = false;
+					}
+					insert += ItemInspector.Sets.getBoni(ItemManager.getByBaseId(item_id).bonus, mustAddToSum, ItemManager.getByBaseId(item_id)) + '</td></tr>';
+				});
+				return insert;
+			},
+			
+			addTotalSetBonus: function(set){
+				var setboni = set.getMergedStages();
+				for (var i = 0; i < setboni.length; i++) {
+					ItemInspector.Sets.getSetBoni(setboni[i]);
+				}
+			},
+			
+			clearBoni: function () {
+				ItemInspector.Sets.boni = {
+					strength: 0,
+					flexibility: 0,
+					dexterity: 0,
+					charisma: 0,
+					build: 0,
+					punch: 0,
+					tough: 0,
+					endurance: 0,
+					health: 0,
+					ride: 0,
+					reflex: 0,
+					dodge: 0,
+					hide: 0,
+					swim: 0,
+					aim: 0,
+					shot: 0,
+					pitfall: 0,
+					finger_dexterity: 0,
+					repair: 0,
+					leadership: 0,
+					tactic: 0,
+					trade: 0,
+					animal: 0,
+					appearance: 0,
+					fortbattle_defense: 0,
+					fortbattle_offense: 0,
+					fortbattle_damage: 0,
+					fortbattle_resistance: 0,
+					fortbattlesector_defense: 0,
+					fortbattlesector_offense: 0,
+					fortbattlesector_damage: 0,
+					damage: 0,
+					jobs: [
+					],
+					speed: 0,
+					dollar: 0,
+					experience: 0,
+					luck: 0,
+					regen: 0,
+					pray: 0,
+				};
+			},
+			
+			getSkills: function (skills, mustAddToSum) {
+			var itemText = '';
+			for (var skill_name in skills) {
+				if (skills.hasOwnProperty(skill_name)) {
+					itemText += '+ ' + skills[skill_name] + ' ' + CharacterSkills.keyNames[skill_name] + '<br>';
+					if(mustAddToSum) {
+						ItemInspector.Sets.boni[skill_name] += skills[skill_name];
+					}
+				}
+			}
+			return itemText;
+			},
+		
+			getAttributes: function (attributes, mustAddToSum) {
+				var itemText = '';
+				for (var attribute_name in attributes) {
+					if (attributes.hasOwnProperty(attribute_name)) {
+						itemText += '+ ' + attributes[attribute_name] + ' ' + CharacterSkills.keyNames[attribute_name] + '<br>';
+						if(mustAddToSum) {
+							ItemInspector.Sets.boni[attribute_name] += attributes[attribute_name];
+						}
+					}
+				}
+				return itemText;
+			},
+			
+			getItem: function (items, mustAddToSum) {
+				var itemText = '';
+				for (var i = 0; i < items.length; i++) {
+					itemText += ItemInspector.Sets.getSetBoniText(items[i]);
+					if(mustAddToSum) {
+						ItemInspector.Sets.getSetBoni(items[i]);
+					}
+					/*if (items[i].type == 'character' && items[i].key == 'level') {
+						var current = items[i].bonus;
+						itemText += '+ ' + Math.ceil(ItemInspector.Sets.level * current.value) + ' ' + CharacterSkills.keyNames[current.name] + '<br>';
+						if(mustAddToSum) {
+							ItemInspector.Sets.boni[current.name] += Math.ceil(ItemInspector.Sets.level * current.value);
+						}
+					}*/
+				}
+				return itemText;
+			},
+			
+			getFortbattleBonus: function (item_bonus, mustAddToSum) {
+				var itemText = '';
+				if(item_bonus.fortbattle.defense > 0){
+					itemText += '+ ' + item_bonus.fortbattle.defense + ' ' + ItemInspectorLang.fortbattle_defense + '<br>';
+					if(mustAddToSum) {
+						ItemInspector.Sets.boni.fortbattle_defense += item_bonus.fortbattle.defense;
+					}
+				}
+				if(item_bonus.fortbattle.offense > 0){
+					itemText += '+ ' + item_bonus.fortbattle.offense + ' ' + ItemInspectorLang.fortbattle_offense + '<br>';
+					if(mustAddToSum) {
+						ItemInspector.Sets.boni.fortbattle_offense += item_bonus.fortbattle.offense;
+					}
+				}
+				if(item_bonus.fortbattle.resistance > 0){
+					itemText += '+ ' + item_bonus.fortbattle.resistance + ' ' + ItemInspectorLang.fortbattle_resistance + '<br>';
+					if(mustAddToSum) {
+						ItemInspector.Sets.boni.fortbattle_resistance += item_bonus.fortbattle.resistance;
+					}
+				}
+				if(item_bonus.fortbattlesector.defense > 0){
+					itemText +=  '+ ' + item_bonus.fortbattlesector.defense + ' ' + ItemInspectorLang.fortbattlesector_defense + '<br>';
+					if(mustAddToSum) {
+						ItemInspector.Sets.boni.fortbattlesector_defense += item_bonus.fortbattlesector.defense; 
+					}
+				}
+				if(item_bonus.fortbattlesector.defense > 0){
+					itemText +=  '+ ' + item_bonus.fortbattlesector.offense + ' ' + ItemInspectorLang.fortbattlesector_offense + '<br>';
+					if(mustAddToSum) {
+						ItemInspector.Sets.boni.fortbattlesector_offense += item_bonus.fortbattlesector.offense;
+					}
+				}
+				if(item_bonus.fortbattlesector.damage > 0){
+					itemText +=  '+ ' + item_bonus.fortbattlesector.damage + ' ' + ItemInspectorLang.fortbattlesector_damage + '<br>';
+					if(mustAddToSum) {
+						ItemInspector.Sets.boni.fortbattlesector_damage += item_bonus.fortbattlesector.damage;
+					}
+				}
+				return itemText;
+			},
+			
+			testShotAndHand: function (set_items) {
+			var shot = false;
+			var hand = false;
+			for (var i = 0; i < set_items.length; i++) {
+				var item = ItemManager.getByBaseId(set_items[i]);
+				if (item.type == 'right_arm') {
+					if (item.sub_type == 'shot') {
+						shot = true;
+					} else if (item.sub_type == 'hand') {
+						hand = true;
+					}
+				}
+			}
+			return (shot && hand);
+			},
+		
+			getSetBoni: function (item) {
+				if (item.type == 'attribute') {
+					ItemInspector.Sets.boni[item.name] += item.value;
+				} else if (item.type == 'skill') {
+					ItemInspector.Sets.boni[item.name] += item.value;
+				} else if (item.type == 'speed') {
+					ItemInspector.Sets.boni['speed'] += Math.round(item.value * 100);
+				} else if (item.type == 'job') {
+					if(item.job == 1000){
+						ItemInspector.Sets.boni.jobs.push(item.value + ' ' + ItemInspectorLang.townConstruction);
+					} else if(item.job == 'all'){
+						ItemInspector.Sets.boni.jobs.push(item.value + ' ' + ItemInspectorLang.workpoints);
+					} else {
+						ItemInspector.Sets.boni.jobs.push(item.value + ' ' + JobList.getJobById(item.job).name);
+					}
+				} else if (item.type == 'dollar') {
+					ItemInspector.Sets.boni['dollar'] += Math.round(item.value * 100);
+				} else if (item.type == 'experience') {
+					ItemInspector.Sets.boni['experience'] += Math.round(item.value * 100);
+				} else if (item.type == 'luck') {
+					ItemInspector.Sets.boni['luck'] += Math.round(item.value * 100);
+				} else if (item.type == 'pray') {
+					ItemInspector.Sets.boni['pray'] += Math.round(item.value);
+				} else if (item.type == 'regen') {
+					ItemInspector.Sets.boni['regen'] += Math.round(item.value * 100);
+				} else if (item.type == 'character') {
+					if (item.bonus.type == 'attribute') {
+						ItemInspector.Sets.boni[item.bonus.name] += Math.ceil(ItemInspector.Sets.level * item.bonus.value);
+					} else if (item.bonus.type == 'dollar') {
+						ItemInspector.Sets.boni['dollar'] += Math.ceil(ItemInspector.Sets.level * (item.bonus.value * 100).toFixed(2));
+					} else if (item.bonus.type == 'experience') {
+						ItemInspector.Sets.boni['experience'] += Math.ceil(ItemInspector.Sets.level * (item.bonus.value * 100).toFixed(2));
+					} else if (item.bonus.type == 'damage') {
+						//handled by getWeaponDamage()
+						//ItemInspector.Sets.boni['damage'] += Math.ceil(ItemInspector.Sets.level * item.bonus.value);
+					} else if (item.bonus.type == 'skill') {
+						ItemInspector.Sets.boni[item.bonus.name] += Math.ceil(ItemInspector.Sets.level * item.bonus.value);
+					}
+				} else if (item.type == 'fortbattle') {
+					if (item.name == 'defense' && item.isSector) {
+					  ItemInspector.Sets.boni['fortbattlesector_defense'] += item.value;
+					} else if (item.name == 'offense' && item.isSector) {
+					  ItemInspector.Sets.boni['fortbattlesector_offense'] += item.value;
+					} else if (item.name == 'damage' && item.isSector) {
+					  ItemInspector.Sets.boni['fortbattlesector_damage'] += item.value;
+					} else if (item.name == 'defense') {
+					  ItemInspector.Sets.boni['fortbattle_defense'] += item.value;
+					} else if (item.name == 'offense') {
+					  ItemInspector.Sets.boni['fortbattle_offense'] += item.value;
+					} else if (item.name == 'damage') {
+					  ItemInspector.Sets.boni['fortbattle_damage'] += item.value;
+					} else if (item.name == 'resistance') {
+					  ItemInspector.Sets.boni['fortbattle_resistance'] += item.value;
+					}
+				} else if (item.type == 'damage') {
+					ItemInspector.Sets.boni['damage'] += item.value;
+				}
+			},
+			
+			getSetBoniText: function (bonus) {
+				var itemText = '';
+				if (bonus.type == 'attribute') {
+					itemText += '+ ' + bonus.value + ' ' + CharacterSkills.keyNames[bonus.name] + '<br>';
+				} else if (bonus.type == 'skill') {
+					itemText += '+ ' + bonus.value + ' ' + CharacterSkills.keyNames[bonus.name] + '<br>';
+				} else if (bonus.type == 'speed') {
+					itemText += '+ ' + Math.round(bonus.value * 100) + ' ' + ItemInspectorLang.speed + '<br>';
+				} else if (bonus.type == 'job') {
+					if(bonus.job == 1000){
+						itemText += '+ ' + bonus.value + ' ' + ItemInspectorLang.townConstruction + '<br>';
+					} else if(bonus.job == 'all'){
+						itemText += '+ ' + bonus.value + ' ' + ItemInspectorLang.workpoints + '<br>';
+					} else {
+						itemText += '+ ' + bonus.value + ' ' + JobList.getJobById(bonus.job).name + '<br>';
+					}
+				} else if (bonus.type == 'dollar') {
+					itemText += '+ ' + Math.round(bonus.value * 100) + '% ' + ItemInspectorLang.dollar + '<br>';
+				} else if (bonus.type == 'experience') {
+					itemText += '+ ' + Math.round(bonus.value * 100) + '% ' + ItemInspectorLang.experience + '<br>';
+				} else if (bonus.type == 'luck') {
+					itemText += '+ ' + Math.round(bonus.value * 100) + '% ' + ItemInspectorLang.luck + '<br>';
+				} else if (bonus.type == 'pray') {
+					itemText += '+ ' + Math.round(bonus.value) + ' ' + ItemInspectorLang.pray + '<br>';
+				} else if (bonus.type == 'regen') {
+					itemText += '+ ' + Math.round(bonus.value * 100) + '% ' + ItemInspectorLang.regen + '<br>';
+				} else if (bonus.type == 'character') {
+					if (bonus.bonus.type == 'attribute') {
+						itemText += '+ ' + Math.ceil(ItemInspector.Sets.level * bonus.bonus.value) + ' ' + CharacterSkills.keyNames[bonus.bonus.name] + '<br>';
+					} else if (bonus.bonus.type == 'dollar') {
+						itemText += '+ ' + Math.ceil(ItemInspector.Sets.level * (bonus.bonus.value * 100).toFixed(2)) + ' ' + ItemInspectorLang.dollar + '<br>';
+					} else if (bonus.bonus.type == 'experience') {
+						itemText += '+ ' + Math.ceil(ItemInspector.Sets.level * (bonus.bonus.value * 100).toFixed(2)) + ' ' + ItemInspectorLang.experience + '<br>';
+					} else if (bonus.bonus.type == 'damage') {
+						//handled by getWeaponDamage()
+						//itemText += '+ ' + Math.ceil(ItemInspector.Sets.level * bonus.bonus.value) + ' ' + ItemInspectorLang.damage + '<br>';
+					} else if (bonus.bonus.type == 'skill') {
+						itemText += '+ ' + Math.ceil(ItemInspector.Sets.level * bonus.bonus.value) + ' ' + CharacterSkills.keyNames[bonus.bonus.name] + '<br>';
+					}
+				} else if (bonus.type == 'fortbattle') {
+					if (bonus.name == 'defense' && bonus.isSector) {
+						itemText += '+ ' + bonus.value + ' ' + ItemInspectorLang.fortbattlesector_defense + '<br>';
+					} else if (bonus.name == 'offense' && bonus.isSector) {
+						itemText += '+ ' + bonus.value + ' ' + ItemInspectorLang.fortbattlesector_offense + '<br>';
+					} else if (bonus.name == 'damage' && bonus.isSector) {
+						itemText += '+ ' + bonus.value + ' ' + ItemInspectorLang.fortbattlesector_damage + '<br>';
+					} else if (bonus.name == 'defense') {
+						itemText += '+ ' + bonus.value + ' ' + ItemInspectorLang.fortbattle_defense + '<br>';
+					} else if (bonus.name == 'offense') {
+						itemText += '+ ' + bonus.value + ' ' + ItemInspectorLang.fortbattle_offense + '<br>';
+					} else if (bonus.name == 'damage') {
+						itemText += '+ ' + bonus.value + ' ' + ItemInspectorLang.fortbattle_damage + '<br>';
+					} else if (bonus.name == 'resistance') {
+						itemText += '+ ' + bonus.value + ' ' + ItemInspectorLang.fortbattle_resistance + '<br>';
+					}
+				} else if (bonus.type == 'damage') {
+					itemText += '+ ' + bonus.value + ' ' + ItemInspectorLang.damage + '<br>';
+				}
+				return itemText;
+			},
+			
+			getStageText: function(set_id) {
+			var insert = '';
+			$.each(ItemInspector.currentSetArray[set_id].bonus, function (index, bonus) {
+				var stages = ItemInspector.currentSetArray[set_id].getMergedStages(index);
+				var bonusText = '';
+			
+				stages.each(function (bonus, index) {
+					bonusText += ItemInspector.Sets.getSetBoniText(bonus);
+				});
+				insert += '<tr>';
+				//insert += '<th>' + index + ' Items:</th><td>';
+				insert += '<td><b>' + index + ' Items:</b><br>';
+				insert += bonusText;
+				insert += '</td></tr>';
+			});
+			return insert;
+		},
+		
+			getWeaponDamage: function (item)  {
+				var damage = 0;
+				for (var i = 0; i < item.bonus.item.length; i++) {
+					var bonus = item.bonus.item[i].bonus;
+					if(bonus.type == 'damage'){
+						damage += Math.round(bonus.value * ItemInspector.Sets.level)
+					}
+				}
+				return '+ ' + (item.damage.damage_min+damage) + '-' + (item.damage.damage_max+damage) + ' ' + ItemInspectorLang.damage + '<br>';
+			},
+		
+			getBoni: function (item_bonus, mustAddToSum, item) {
+				var itemText = '';
+				
+				if (item.type == 'right_arm' || item.type == 'left_arm') {
+					itemText += ItemInspector.Sets.getWeaponDamage(item);
+				}
+				
+				itemText += ItemInspector.Sets.getAttributes(item_bonus.attributes, mustAddToSum);
+				itemText += ItemInspector.Sets.getSkills(item_bonus.skills, mustAddToSum);
+				itemText += ItemInspector.Sets.getItem(item_bonus.item, mustAddToSum);
+				itemText += ItemInspector.Sets.getFortbattleBonus(item_bonus, mustAddToSum);
+				
+				return itemText;
+			},
+		};
+    
+	ItemInspector.Skript.init();
+});
