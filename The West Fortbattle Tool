@@ -4,7 +4,7 @@
 // @author westernblumi
 // @description Fort battle tools for The West!
 // @include https://*.the-west.*/game.php*
-// @version	1.14
+// @version	1.15
 // @grant none
 // ==/UserScript==
 // translation: westernblumi(German & English), pepe100(Spanish), Ruslan Jackson(Italiano)
@@ -16,7 +16,7 @@
     document.body.removeChild(script);
 })(function() {
     TWFBTstart = {
-        version: '1.14',
+        version: '1.15',
         langs: {
             en: {
                 language: 'English',
@@ -473,11 +473,18 @@
 			var styling = $('<style></style>').text('.TWFBT_left { position: relative; left: 28px; top: 20px;} .TWFBT_textarea {left: 20px; top: 25px;} .TWFBT_button {left: 25px; top: 30px;}');
 			$('head').append(styling);
 			
-            var menuContainer = $('<div class="menulink" onClick="TWFBT.GUI.openTWFBTWindow();" title="' + TWFBTlang.scriptName + '" />').css('background-image', 'url(' + TWFBT.Images.settings + ')').css('background-position', '0px 0px').mouseenter(function() {
+            /*var menuContainer = $('<div class="menulink" onClick="TWFBT.GUI.openTWFBTWindow();" title="' + TWFBTlang.scriptName + '" />').css('background-image', 'url(' + TWFBT.Images.settings + ')').css('background-position', '0px 0px').mouseenter(function() {
                 $(this).css('background-position', '-25px 0px');
             }).mouseleave(function() {
                 $(this).css('background-position', '0px 0px');
+            });*/
+			var menuContainer = $('<div class="menulink" onClick="TWFBT.GUI.openTWFBTWindow();" title="' + TWFBTlang.scriptName + '" />').css('background-image', 'url(' + TWFBT.Images.settings + ')').css('background-position', '0px 0px').on( "mouseenter", function() {
+                $(this).css('background-position', '-25px 0px');
+            }).on('mouseleave', function() {
+                $(this).css('background-position', '0px 0px');
             });
+			
+			
             $('#ui_menubar').append($('<div id="TWFBT_menubutton" class="ui_menucontainer" />').append(menuContainer).append('<div class="menucontainer_bottom" />'));
         },
     };
@@ -490,6 +497,7 @@
             TWFBT.GUI.window = wman.open('TWFBT', TWFBTlang.scriptName, 'noreload').setMiniTitle(TWFBTlang.scriptName).setMaxSize(1268, 838);
             TWFBT.GUI.window.addTab(TWFBTlang.calculator, 'TWFBTCalcSkill', TWFBT.GUI.calcSkill);
 			TWFBT.GUI.window.addTab(TWFBTlang.importBattle, 'TWFBTBattleImporterTab', TWFBT.GUI.showBattleImporter);
+			//TWFBT.GUI.window.addTab('generator', 'TWFBTBattleGeneratorTab', TWFBT.GUI.showGenerator);
         },
         getDefault: function(tab) {
             TWFBT.GUI.window.setResizeable(false).setSize(748, 471).clearContentPane().removeClass('nocloseall').setTitle('TWFBTCalcSkill');
@@ -499,6 +507,28 @@
             $('.textart_title', wnd).css('display', '');
             TWFBT.GUI.window.activateTab(tab);
         },
+		/*showGenerator: function() {
+			TWFBT.GUI.getDefault('TWFBTBattleGeneratorTab');
+            TWFBT.GUI.window.setTitle(TWFBTlang.scriptName);
+			
+			var input = new west.gui.Textarea().setId("TWFBTbattleImporterInput2").setWidth(635).setHeight(260);
+			
+			var importButton = new west.gui.Button(TWFBTlang.importBattle, function() {
+				try {
+					TWFBT.Statistics.stats.result = JSON.parse(input.getContent());
+					MessageSuccess(TWFBTlang.importSuccessfull).show();
+					TWFBT.Statistics.openStatsGUIOpen();
+				}
+				catch(err) {
+					MessageError(TWFBTlang.importError).show();
+				}
+            });
+			
+			$(TWFBT.GUI.window.getContentPane()).append($("<span class='TWFBT_left strong'>" + 'Füge hier den Text ein, den du beim exportieren erhalten hast' + ":<br /></span>"));
+			$(TWFBT.GUI.window.getContentPane()).append(input.getMainDiv().addClass('TWFBT_textarea'));
+			$(importButton.getMainDiv()).addClass("TWFBT_button");
+			$(TWFBT.GUI.window.getContentPane()).append(importButton.getMainDiv());
+		},*/
 		showBattleImporter: function() {
 			TWFBT.GUI.getDefault('TWFBTBattleImporterTab');
             TWFBT.GUI.window.setTitle(TWFBTlang.scriptName);
@@ -1537,16 +1567,13 @@
 				for (x = 0; x < TWFBT.Statistics.stats.result.attackerlist.length; x++) {
 					var attacker = TWFBT.Statistics.stats.result.attackerlist[x];
 					var weapon = ItemManager.get(attacker.weaponid);
-					if(weapon == undefined){
-						console.log(attacker.name +' ' +attacker.weaponid);
-					}
 					var damage = weapon.getDamage();
 					var groundDamage = TWFBT.Statistics.getGroundDamage(attacker.charlevel, weapon.bonus.item, weapon.getItemLevel());
 					var damageMin = attacker.weaponmindmg-(damage.min+groundDamage);
 					var damageMax = attacker.weaponmaxdmg-(damage.max+groundDamage);
 					if(weaponContainerAttacker[damageMin + '-' + damageMax] == undefined){
-						damageMin--;
-						damageMax--;
+						damageMin = Math.round(damageMin/5)*5;
+						damageMax = Math.round(damageMax/5)*5;
 					} 
 					weaponContainerAttacker[damageMin + '-' + damageMax] += 1;
 				}
@@ -1557,9 +1584,9 @@
 					var groundDamage = TWFBT.Statistics.getGroundDamage(defender.charlevel, weapon.bonus.item, weapon.getItemLevel());
 					var damageMin = defender.weaponmindmg-(damage.min+groundDamage);
 					var damageMax = defender.weaponmaxdmg-(damage.max+groundDamage);
-					if(weaponContainerDefender[damageMin + '-' + damageMax] == undefined){
-						damageMin--;
-						damageMax--;
+					if(weaponContainerDefender[damageMin + '-' + damageMax] == undefined || weaponContainerDefender[damageMin + '-' + damageMax] == NaN){
+						damageMin = Math.round(damageMin/5)*5;
+						damageMax = Math.round(damageMax/5)*5;
 					}
 					weaponContainerDefender[damageMin + '-' + damageMax] += 1;
 				}
@@ -1756,6 +1783,7 @@
 					progress.setValue(deff);
 				}
 				var obj = progress.getMainDiv();
+				console.log('att: ' + att + ' deff: ' + deff);
 				obj[0].childNodes[1].childNodes[3].innerText = format_number(att) +' / ' + format_number(deff);
 				return obj;
 			};
@@ -1774,7 +1802,7 @@
 				icon.style.width = '16px';
 				icon.style.height = '16px';
 				icon.style.display = 'inline-block';
-				icon.style.background = "url('https://westzzs.innogamescdn.com/images/fort/battle/report_icons.png')";
+				icon.style.background = "url('https://westde.innogamescdn.com/images/fort/battle/report_icons.png')";
 				icon.title = tooltip;
 				icon.style.backgroundPosition = backgroundPosition;
 				return icon
