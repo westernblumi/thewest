@@ -1,5 +1,5 @@
 var scriptUpdate={
-	TWFBT:'1.15',
+	TWFBT:'1.16',
 	TWFBTNew:'Bug fixes',
 	announcementBlock: '1.02',
 	announcementBlockNew: 'Support for other language servers',
