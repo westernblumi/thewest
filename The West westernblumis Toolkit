@@ -3,7 +3,7 @@
 // @namespace   westernblumi
 // @include 	https://*.the-west.*/game.php*
 // @author 		westernblumi
-// @version     1.07
+// @version     1.08
 // @grant       none
 // @description Some useful improvements for The West
 // ==/UserScript==
@@ -14,7 +14,7 @@
   document.body.appendChild(script);
   document.body.removeChild(script);
 }) (function () {
-	
+
 	WTKstart = {
       langs: {
         en: {
@@ -55,8 +55,6 @@
 			willNotBeIgnored: 'will not be ignored anymore',
 			churchLevels: 'Levels',
 			FeatChurchLevels: 'Shows how many additional church levels you can build in your town',
-			enterValidId: 'You must specify an id between 1000 und 2147483647',
-			add: 'Add',
 			deleteMarkedItems: 'Delete marked items',
 			youHaveFound: 'You have found following item:',
 			itemFinder: 'Item Finder',
@@ -68,8 +66,24 @@
 			FeatShowFort: 'Links the report of a fortbattle declaration to a certain fort instead of the fortbattle overview window',
 			FeatBuildingProgress: 'Show the construction progress in a building window',
 			FeatImprovedBuildCityhall: 'Show only buildings that have not been fully built',
+			searchItem: 'Search Item',
+			search: 'Search',
+			whatItemsWouldYouLikeToSearchFor: 'What items would you like to search for?',
+			howManyOfThemWouldYouLikeToCollect: 'How many of these do you want to collect?',
+			nameOfTheItem: 'Name of the item:',
+			numberOfItems: 'Number of items:',
+			searchResult: 'Search result',
+			itemAmountMustBeHigherThan0: 'The number of items must be greater than 0!',
+			nameCannotBeEmpty: 'The name must not be empty!',
+			emptySearchResult: 'Sorry, your search does not return any results. Please check your input. Maybe the item is already on your list!',
+			thereAreMoreItems: 'The search yielded more results.',
+			restrictYourSearch: 'Narrow the search to get more precise results.',
+			help: 'Help',
+			back: 'Go back',
+			itemFinderHelpContent: '<b>Add:</b><ol style="padding-inline-start: 40px;"><li>Click on <b>Search Item</b>. This will open the search dialog<br></li><li>Enter the name of the item you want to search for.<br>Please enter how many of them you want to search. Click on <b>Search</b></li><li>A dialog with the search results opens</li><li>Click on the item you want to add to your list</li></ol><br><b>Delete:</b><ol style="padding-inline-start: 40px;"><li>Click on an item. The item will then become transparent</li><li>Click on <b>Delete marked items</b> to delete the selected items</li></ol><br><b>Enable alarm:</b><ol style="padding-inline-start: 40px;"><li>Click on the lower area with the number of items you are looking for</li><li>The area gets a yellow frame, the alarm is activated<br>and you will be notified as soon as the item you are looking for is found</li><li>Click on the area again and the frame and the alarm will be removed again</li></ol>',
+			FeatExtendedBBCodes: 'Show correct BB-codes for color, size and images also in profiles, telegrams and notes. This will work only for people who have the script installed. All other player will still see these "wrong" codes'
         },
-        de: {
+		de: {
 			language: 'German (Deutsch)',
 			features: 'Features',
 			FeatRemoveTownBlinkEvent: 'Entfernt das Blinken des Stadtforums im Menü',
@@ -107,8 +121,6 @@
 			willNotBeIgnored: 'wird jetzt nicht mehr ignoriert',
 			churchLevels: 'Stufen',
 			FeatChurchLevels: 'Zeigt an, wie viele Kirchenstufen man noch bauen kann',
-			enterValidId: 'Du musst eine Id zwischen 1000 und 2147483647 angeben',
-			add: 'Hinzufügen',
 			deleteMarkedItems: 'Markierte Items löschen',
 			youHaveFound: 'Du hast folgenden Gegenstand gefunden:',
 			itemFinder: 'Item Finder',
@@ -120,7 +132,23 @@
 			FeatShowFort: 'Verlinke im Bericht einer Fortmapfankündigung das konkrete Fort anstatt nur die Fortkampf Übersicht',
 			FeatBuildingProgress: 'Zeige im Ausbaufenster auch den Baufortschritt',
 			FeatImprovedBuildCityhall: 'Zeige nur Gebäude die noch ausgebaut werden können',
-        },
+			searchItem: 'Item suchen',
+			search: 'Suchen',
+			whatItemsWouldYouLikeToSearchFor: 'Nach welchen Gegenständen möchtest du suchen?',
+			howManyOfThemWouldYouLikeToCollect: 'Wie viele davon möchtest du sammeln?',
+			nameOfTheItem: 'Name des Gegenstandes:',
+			numberOfItems: 'Anzahl der Gegenstände:',
+			searchResult: 'Suchergebnis',
+			itemAmountMustBeHigherThan0: 'Die Anzahl der Gegenstände muss größer als 0 sein!',
+			nameCannotBeEmpty: 'Der Name darf nicht leer sein!',
+			emptySearchResult: 'Deine Suche liefert leider keine Ergebnisse. Überprüfe bitte deine Eingabe. Vielleicht ist der Gegenstand auch schon auf deiner Liste!',
+			thereAreMoreItems: 'Die Suche lieferte mehr Ergebnisse.',
+			restrictYourSearch: 'Schränke die Suche ein, um genauere Ergebnisse zu erhalten.',
+			help: 'Hilfe',
+			back: 'Zurück',
+			itemFinderHelpContent: '<b>Hinzufügen:</b><ol style="padding-inline-start: 40px;"><li>Klick auf <b>Item suchen</b>. Daraufhin öffnet sich der Such-Dialog</li><li>Gib den Namen des Items an, das du suchen möchtest.<br>Trage ein, wie viele davon du suchen möchtest. Klick auf <b>Suchen</b></li><li>Ein Dialog mit den Suchergebnissen öffnet sich</li><li>Klick auf das Item, das du deiner Liste hinzufügen möchtest</li></ol><br><b>Löschen:</b><ol style="padding-inline-start: 40px;"><li>Klick auf ein Item. Das Item wird daraufhin transparent</li><li>Klick auf <b>Markierte Items löschen</b>, um die markierten Elemente zu löschen</li></ol><br><b>Alarm einschalten:</b><ol style="padding-inline-start: 40px;"><li>Klick auf den unteren Bereich mit der Anzahl der gesuchten Items</li><li>Der Bereich erhält einen gelben Rahmen, der Alarm ist somit aktiviert<br>und du wirst benachrichtigt, sobald das gesuchte Item gefunden wurde</li><li>Klickst du nochmal auf den Bereich wird der Rahmen und der Alarm wieder entfernt</li></ol>',
+			FeatExtendedBBCodes: 'Zeige BB-Codes für Farbe, Größe und Bilder auch in Profilen, Telegrammen und Notizen richtig an. Das ganze funktioniert nur für Spieler, die das Skript auch installiert haben. Alle anderen sehen weiterhin die "falschen" Codes'
+		},
 		pl: {
 			language: 'Polish',
 			features: 'Funkcje',
@@ -159,8 +187,6 @@
 			willNotBeIgnored: 'will not be ignored anymore',
 			churchLevels: 'Levels',
 			FeatChurchLevels: 'Shows how many additional church levels you can build in your town',
-			enterValidId: 'You must specify an id between 1000 und 2147483647',
-			add: 'Add',
 			deleteMarkedItems: 'Delete marked items',
 			youHaveFound: 'You have found following item:',
 			itemFinder: 'Item Finder',
@@ -172,7 +198,23 @@
 			FeatShowFort: 'Links the report of a fortbattle declaration to a certain fort instead of the fortbattle overview window',
 			FeatBuildingProgress: 'Show the construction progress in a building window',
 			FeatImprovedBuildCityhall: 'Show only buildings that have not been fully built',
-		},
+			searchItem: 'Search Item',
+			search: 'Search',
+			whatItemsWouldYouLikeToSearchFor: 'What items would you like to search for?',
+			howManyOfThemWouldYouLikeToCollect: 'How many of these do you want to collect?',
+			nameOfTheItem: 'Name of the item:',
+			numberOfItems: 'Number of items:',
+			searchResult: 'Search result',
+			itemAmountMustBeHigherThan0: 'The number of items must be greater than 0!',
+			nameCannotBeEmpty: 'The name must not be empty!',
+			emptySearchResult: 'Sorry, your search does not return any results. Please check your input. Maybe the item is already on your list!',
+			thereAreMoreItems: 'The search yielded more results.',
+			restrictYourSearch: 'Narrow the search to get more precise results.',
+			help: 'Help',
+			back: 'Go back',
+			itemFinderHelpContent: '<b>Add:</b><ol style="padding-inline-start: 40px;"><li>Click on <b>Search Item</b>. This will open the search dialog<br></li><li>Enter the name of the item you want to search for.<br>Please enter how many of them you want to search. Click on <b>Search</b></li><li>A dialog with the search results opens</li><li>Click on the item you want to add to your list</li></ol><br><b>Delete:</b><ol style="padding-inline-start: 40px;"><li>Click on an item. The item will then become transparent</li><li>Click on <b>Delete marked items</b> to delete the selected items</li></ol><br><b>Enable alarm:</b><ol style="padding-inline-start: 40px;"><li>Click on the lower area with the number of items you are looking for</li><li>The area gets a yellow frame, the alarm is activated<br>and you will be notified as soon as the item you are looking for is found</li><li>Click on the area again and the frame and the alarm will be removed again</li></ol>',
+			FeatExtendedBBCodes: 'Show correct BB-codes for color, size and images also in profiles, telegrams and notes. This will work only for people who have the script installed. All other player will still see these "wrong" codes'
+        },
 		es: {
 			language: 'Spanish',
 			features: 'Funciones',
@@ -211,8 +253,6 @@
 			willNotBeIgnored: 'ya no será ignorado',
 			churchLevels: 'Niveles',
 			FeatChurchLevels: 'Muestra cuántos niveles adicionales de la Iglesia puede construir en su ciudad',
-			enterValidId: 'Debe esoecificar una id entre 1000 y 2147483647',
-			add: 'Agregar',
 			deleteMarkedItems: 'Borrar artículos marcados',
 			youHaveFound: 'Has encontrado el siguiente artículo:',
 			itemFinder: 'Buscador artículos',
@@ -224,12 +264,28 @@
 			FeatShowFort: 'Enlaza al informe de una declaración de batalla de un determinado fuerte en lugar de a la ventana resumen ',
 			FeatBuildingProgress: 'Muestra el progreso de construcción en la ventana del edificio',
 			FeatImprovedBuildCityhall: 'Muestra solo los edificios que no están completamente construidos',
-		}, 
+			searchItem: 'Search Item',
+			search: 'Search',
+			whatItemsWouldYouLikeToSearchFor: 'What items would you like to search for?',
+			howManyOfThemWouldYouLikeToCollect: 'How many of these do you want to collect?',
+			nameOfTheItem: 'Name of the item:',
+			numberOfItems: 'Number of items:',
+			searchResult: 'Search result',
+			itemAmountMustBeHigherThan0: 'The number of items must be greater than 0!',
+			nameCannotBeEmpty: 'The name must not be empty!',
+			emptySearchResult: 'Sorry, your search does not return any results. Please check your input. Maybe the item is already on your list!',
+			thereAreMoreItems: 'The search yielded more results.',
+			restrictYourSearch: 'Narrow the search to get more precise results.',
+			help: 'Help',
+			back: 'Go back',
+			itemFinderHelpContent: '<b>Add:</b><ol style="padding-inline-start: 40px;"><li>Click on <b>Search Item</b>. This will open the search dialog<br></li><li>Enter the name of the item you want to search for.<br>Please enter how many of them you want to search. Click on <b>Search</b></li><li>A dialog with the search results opens</li><li>Click on the item you want to add to your list</li></ol><br><b>Delete:</b><ol style="padding-inline-start: 40px;"><li>Click on an item. The item will then become transparent</li><li>Click on <b>Delete marked items</b> to delete the selected items</li></ol><br><b>Enable alarm:</b><ol style="padding-inline-start: 40px;"><li>Click on the lower area with the number of items you are looking for</li><li>The area gets a yellow frame, the alarm is activated<br>and you will be notified as soon as the item you are looking for is found</li><li>Click on the area again and the frame and the alarm will be removed again</li></ol>',
+			FeatExtendedBBCodes: 'Show correct BB-codes for color, size and images also in profiles, telegrams and notes. This will work only for people who have the script installed. All other player will still see these "wrong" codes'
+        },
       }
     };
-	
+
 	WTK = {
-		version: '1.07',
+		version: '1.08',
 		name: 'The West - westernblumis Toolkit',
         author: 'westernblumi',
 		website: 'https://greasyfork.org/de/scripts/29596-the-west-westernblumis-toolkit',
@@ -248,6 +304,7 @@
 			ShowFort: true,
 			BuildingProgress: true,
 			ImprovedBuildCityhall: true,
+			ExtendedBBCodes: true,
         },
 		Images: {
 			menudailyitems: 'data:image/jpeg;base64,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',
@@ -268,6 +325,15 @@
 				$(this).css('background-position', '0px 0px');
 			});
 			$('#ui_menubar').append($('<div id="WTK_menubutton" class="ui_menucontainer" />').append(menuContainer).append('<div class="menucontainer_bottom" />'));
+
+			var styling = $('<style></style>').text(
+				'.WTK_find_notifcation {position: absolute;width: 51px;color: #fff;min-width: 23px;line-height: 12px;font-size: 10px;bottom: 3px;left: 2px;text-align: center;background: rgba(127, 111, 85, 0.7);border-radius: 0 2px 0 2px;box-shadow: 0px -1px 2px #000000;font-weight: bold;-webkit-font-smoothing: antialiased;-moz-osx-font-smoothing: grayscale;padding: 0 2px;opacity: 1;}' +
+				'.WTK_find_notifcation_highlight {border: 2px;border-color: yellow;border-style: solid;width: 48px;}' +
+				'.WTK_item_border {border: transparent;border-style: solid;border-width: 2px;border-radius: 5px;}' +
+				'.WTK_item_border_green {border: green;border-style: solid;border-width: 2px;border-radius: 5px;}'
+			);
+			$('head').append(styling);
+
 			WTK.Skript.updateFeat();
         },
         updateFeat: function () {
@@ -281,13 +347,13 @@
 				  } catch (e) {}
 				}
 			}
-			WTK.ItemFinder.init();
+			WTK.ExtendedItemFinder.init();
         },
         getFeature: function (name) {
           return (WTK.Data[name] !== undefined) ? WTK.Data[name] : WTK.Features[name];
         },
     };
-	
+
 	WTK.GUI = {
 		openMenu: function () {
 			WTK.GUI.open();
@@ -299,7 +365,7 @@
 			WTK.GUI.window = wman.open('WTKMenuWindow', WTK.name, 'noreload').setMiniTitle(WTKlang.shortName).setMaxSize(1268, 838);
 			WTK.GUI.window.addTab(WTKlang.settings, 'WTKSettingsTab', WTK.GUI.openSettings);
 			WTK.GUI.window.addTab(WTKlang.dailyItems, 'WTKDailyItemsTab', WTK.DailyItemHelper.showDailyItems);
-			WTK.GUI.window.addTab(WTKlang.itemFinder, 'WTKItemFinder', WTK.ItemFinder.showItemFinder);
+			WTK.GUI.window.addTab(WTKlang.itemFinder, 'WTKExtendedItemFinder', WTK.ExtendedItemFinder.showExtendedItemFinder);
         },
         getDefault: function (tab) {
 			WTK.GUI.window.setResizeable(false).setSize(748, 471).clearContentPane().removeClass('nocloseall').setTitle(WTK.name);
@@ -311,9 +377,9 @@
         },
 		openSettings: function () {
 			WTK.GUI.getDefault('WTKSettingsTab');
-		  
+
 			var featScroll = new west.gui.Scrollpane();
-          
+
 			featScroll.appendContent('<h2>' + WTKlang.features + '</h2>');
 			for (var k in WTK.Features) {
 				WTK.GUI.checkbox[k] = new west.gui.Checkbox().setLabel(WTKlang['Feat' + k]).setSelected(WTK.Skript.getFeature(k)).appendTo(featScroll.getContentPane());
@@ -341,7 +407,7 @@
 			$(WTK.GUI.window.getContentPane()).append(featScroll.getMainDiv()).append(button.getMainDiv());
         },
 	};
-	
+
 	WTK.RemoveTownBlinkEvent = {
         init: function () {
 			setTimeout((function () {
@@ -353,7 +419,7 @@
             }), 1000);
         },
     };
-	
+
 	WTK.NewStatistics = {
         init: function () {
 			AchievementStatistic.backup_init = AchievementStatistic.init;
@@ -374,18 +440,11 @@
 							});
 							i++;
 						});
-						table.appendRow();
-						table.appendRow($('<h2>'+WTKlang.adventures+'</h2>'));
-						
-						var button = new west.gui.Button(WTKlang.getData, WTK.NewStatistics.getDataAdventuresPlayed);
-						table.appendRow().appendToCell(-1,'desc',WTKlang.adventuresPlayed).appendToCell(-1,'value',button.getMainDiv());
-						button = new west.gui.Button(WTKlang.getData, WTK.NewStatistics.getDataAdventuresKnockouts);
-						table.appendRow().appendToCell(-1,'desc',WTKlang.adventuresKnockouts).appendToCell(-1,'value',button.getMainDiv());
 						button = new west.gui.Button(WTKlang.getData, WTK.NewStatistics.getDataAdventuresDodges);
 						table.appendRow().appendToCell(-1,'desc',WTKlang.adventuresDodges).appendToCell(-1,'value',button.getMainDiv());
 						button = new west.gui.Button(WTKlang.getData, WTK.NewStatistics.getDataAdventuresMiss);
 						table.appendRow().appendToCell(-1,'desc',WTKlang.adventuresMiss).appendToCell(-1,'value',button.getMainDiv());
-						
+
 						that.window.$('div.achievement-statistic',AchievementWindow.DOM).empty();
 						table.appendTo(that.window.$('div.achievement-statistic',AchievementWindow.DOM));
 					},this);
@@ -395,27 +454,7 @@
 				return this;
 			};
         },
-		
-		getDataAdventuresPlayed: function () {
-			Ajax.remoteCall('achievement','track',{achvid: 60004}, function(json)
-			{
-				if(!json.error){
-					MessageSuccess(WTKlang.adventuresPlayed + ': ' + json.current).show();
-				}
-				Ajax.remoteCall('achievement','untrack',{}, function(json){});
-			});
-		},
-		
-		getDataAdventuresKnockouts: function () {
-			Ajax.remoteCall('achievement','track',{achvid: 60030}, function(json)
-			{
-				if(!json.error){
-					MessageSuccess(WTKlang.adventuresKnockouts + ': ' + json.current).show();
-				}
-				Ajax.remoteCall('achievement','untrack',{}, function(json){});
-			});
-		},
-		
+
 		getDataAdventuresMiss: function () {
 			Ajax.remoteCall('achievement','track',{achvid: 60031}, function(json)
 			{
@@ -424,10 +463,10 @@
 				}
 				Ajax.remoteCall('achievement','untrack',{}, function(json){});
 			});
-			
-			
+
+
 		},
-		
+
 		getDataAdventuresDodges: function () {
 			Ajax.remoteCall('achievement','track',{achvid: 60028}, function(json)
 			{
@@ -436,17 +475,17 @@
 				}
 				Ajax.remoteCall('achievement','untrack',{}, function(json){});
 			});
-			
-			
+
+
 		},
     };
-	
+
 	WTK.OpenTrader = {
         init: function () {
 			setTimeout((function () {
 				setInterval(WTK.OpenTrader.checkTrader, 10000);
             }), 10000);
-			
+
         },
 		checkTrader: function(){
 			if(WTK.OpenTrader.TraderTime == undefined){
@@ -467,9 +506,9 @@
 			}
 		},
     };
-	
+
 	WTK.DailyItemHelper = {
-		
+
 		ghostTown: [
 			{minLevel: 21, maxLevel: 50, amount: 1, profession: 100, itemID: 715000},
 			{minLevel: 27, maxLevel: 60, amount: 1, profession: 100, itemID: 760000},
@@ -537,7 +576,7 @@
 				{minLevel: 63, maxLevel: 87, amount: 1, profession: 100, itemID: 1708000},
 				{minLevel: 75, maxLevel: 150, amount: 1, profession: 100, itemID: 730000},
 				{minLevel: 120, maxLevel: 150, amount: 3, profession: 100, itemID: 2433000},
-			], 
+			],
 			friday: [
 				{minLevel: 3, maxLevel: 61, amount: 1, profession: 100, itemID: 705000},
 				{minLevel: 21, maxLevel: 42, amount: 1, profession: 100, itemID: 715000},
@@ -565,19 +604,19 @@
 			{minLevel: 0, maxLevel: 150, amount: 15, profession: 100, itemID: 2161000},
 			{minLevel: 0, maxLevel: 150, amount: 15, profession: 100, itemID: 2162000},
 			{minLevel: 0, maxLevel: 150, amount: 15, profession: 100, itemID: 2163000},
-			
+
 			{minLevel: 20, maxLevel: 150, amount: 1, profession: 1, itemID: 1940000},
 			{minLevel: 20, maxLevel: 150, amount: 1, profession: 1, itemID: 1871000},
 			{minLevel: 20, maxLevel: 150, amount: 1, profession: 1, itemID: 1879000},
-			
+
 			{minLevel: 20, maxLevel: 150, amount: 1, profession: 2, itemID: 1939000},
 			{minLevel: 20, maxLevel: 150, amount: 1, profession: 2, itemID: 1890000},
 			{minLevel: 20, maxLevel: 150, amount: 1, profession: 2, itemID: 1898000},
-			
+
 			{minLevel: 20, maxLevel: 150, amount: 1, profession: 3, itemID: 1938000},
 			{minLevel: 20, maxLevel: 150, amount: 1, profession: 3, itemID: 1910000},
 			{minLevel: 20, maxLevel: 150, amount: 1, profession: 3, itemID: 1916000},
-			
+
 			{minLevel: 20, maxLevel: 150, amount: 1, profession: 4, itemID: 1937000},
 			{minLevel: 20, maxLevel: 150, amount: 1, profession: 4, itemID: 1928000},
 			{minLevel: 20, maxLevel: 150, amount: 1, profession: 4, itemID: 1934000},
@@ -590,7 +629,7 @@
 			});
 			$('#ui_menubar').append($('<div id="WTK_menubutton_DailyItemHelper" class="ui_menucontainer" />').append(menuContainer).append('<div class="menucontainer_bottom" />'));
         },
-		
+
 		getQuestsFromArray: function(questArray) {
 			var text = '';
 			for (var i = 0; i < questArray.length; i++) {
@@ -607,16 +646,16 @@
 			}
 			return text;
 		},
-		
+
 		showDailyItems: function() {
 			WTK.GUI.open();
 			WTK.GUI.getDefault('WTKDailyItemsTab');
-			
+
 			var scrollPane = new west.gui.Scrollpane();
 			$(scrollPane.getMainDiv()).css({
 				'height': '380px',
 			});
-			
+
 			scrollPane.appendContent('<div style="float: left; padding: 10px 30px 5px 5px;"><b>'+WTKlang.saloon + ':</b><br>'+WTK.DailyItemHelper.getQuestsFromArray(WTK.DailyItemHelper.others)+'</div>');
 			scrollPane.appendContent('<div style="float: left; padding: 10px 30px 5px 5px;"><b>'+WTKlang.indianVillage + ':</b><br>'+WTK.DailyItemHelper.getQuestsFromArray(WTK.DailyItemHelper.indianVillage)+'</div>');
 			scrollPane.appendContent('<div style="float: left; padding: 10px 30px 5px 5px;"><b>'+WTKlang.ghostTown + ':</b><br>'+WTK.DailyItemHelper.getQuestsFromArray(WTK.DailyItemHelper.ghostTown)+'</div>');
@@ -635,10 +674,10 @@
 			$(WTK.GUI.window.getContentPane()).append(scrollPane.getMainDiv());
 		},
     };
-	
+
 	WTK.AdventureBlockPlayer = {
 		blockedUsers: [],
-		
+
 		init: function () {
 			Chat.Formatter.backup_formatMessage = Chat.Formatter.formatMessage;
 			Chat.Formatter.formatMessage = function (msg, from, time, highlight, classNames) {
@@ -652,10 +691,10 @@
 					return["<table cellpadding='0' cellspacing='0' class='" + classNames + "'>", "<tr>", "<td style='white-space: nowrap;' class='chat_info'>", "<span class='chat_time'>[" + Chat.Formatter.formatTime(time) + "]</span>", "<span class='chat_from'>" + from + "</span>", "&nbsp;", "</td>", "<td class='chat_text " + (highlight ? "chat_highlight" : "") + "'>", msg, "</td>", "</tr>", "</table>"].join("");
 				}
 			};
-			
+
 			ChatWindow.Client.backup_onClick = ChatWindow.Client.onClick;
 			ChatWindow.Client.onClick = function (args, id) {
-					
+
 				var client = Chat.Resource.Manager.getClient(id), isOnline;
 				if (!client || client.myself)return;
 				isOnline = Chat.Resource.Client.STATUS_OFFLINE != client.statusId;
@@ -667,7 +706,7 @@
 								break;
 							case 1:
 								if (WTK.AdventureBlockPlayer.blockedUsers.includes(client.pname)) {
-									
+
 									WTK.AdventureBlockPlayer.blockedUsers = jQuery.grep(WTK.AdventureBlockPlayer.blockedUsers, function(value) {
 										return value != client.pname;
 									});
@@ -686,18 +725,18 @@
 				else {
 					ChatWindow.Client.backup_onClick.call(this, args, id);
 				}
-		
+
 			};
-			
+
 			var savedBlockedUsers = JSON.parse(localStorage.getItem('WTKAdventureBlockedPlayers'));
 			if(savedBlockedUsers != null){
 				WTK.AdventureBlockPlayer.blockedUsers = savedBlockedUsers;
 			}
 		},
-		
-		
+
+
 	};
-	
+
 	WTK.ChurchLevels = {
 		init: function () {
 			BuildWindow.updateLaborPoints_backup = BuildWindow.updateLaborPoints;
@@ -710,80 +749,7 @@
 			}
 		},
 	};
-	
-	WTK.ItemFinder = {
-		itemsToFind: [],
-		init: function () {
-			var savedItemsToFind = JSON.parse(localStorage.getItem('WTKItemFinderItems'));
-			if(savedItemsToFind != null){
-				WTK.ItemFinder.itemsToFind = savedItemsToFind;
-			}
-			Bag.handleChanges_backup = Bag.handleChanges;
-			Bag.handleChanges = function (changes, from) {
-				var i = 0, l = changes.length, item;
-				for (i; i < l; i++) {
-					item = this.getItemByItemId(changes[i].item_id);
-					if (!item && changes[i].count > 0 && $.inArray(changes[i].item_id,WTK.ItemFinder.itemsToFind) != -1 && from != 'wear') {
-						var item2 = ItemManager.get(changes[i].item_id);
-						var popup = new ItemPopup(item2,{}).popup;
-						new west.gui.Dialog(WTKlang.itemFinder, '<div class="item item_inventory hasMousePopup" title="' + popup.getXHTML().escapeHTML() + '"><img class="tw_item item_inventory_img dnd_draggable" src="' + item2.image + '"></div>' + WTKlang.youHaveFound + '<br><br><div style="text-align: center;"><b>' + item2.name +'</b></div><br>').addButton('ok').setModal(true, false, {
-							bg : "https://westde.innogamescdn.com/images/curtain_bg.png", opacity : 0.7
-						}).setHeight('40px').show();
-					}
-				}
-				Bag.handleChanges_backup.call(this, changes, from);	
-			}
-		},
-		
-		showItemFinder: function() {
-			WTK.GUI.open();
-			WTK.GUI.getDefault('WTKItemFinder');
-			var scrollPane = new west.gui.Scrollpane();
-			var itemInput = new west.gui.Textfield('WTKItemFinder_input').setClass4Input('input_layout');
-			var addButton = new west.gui.Button(WTKlang.add, function() {
-				var value = parseInt($('#WTKItemFinder_input').val());
-				if(value < 1000 || value > 2147483647 || ItemManager.get(value) == undefined){
-					MessageError(WTKlang.enterValidId).show();
-				} else {
-					WTK.ItemFinder.itemsToFind.push(value);
-					localStorage.setItem('WTKItemFinderItems', JSON.stringify(WTK.ItemFinder.itemsToFind));
-					WTK.ItemFinder.showItemFinder();
-				}
-            });
-			var deleteButton = new west.gui.Button(WTKlang.deleteMarkedItems, function() {
-				var selectedItems = $('.active_tab_id_WTKItemFinder').find('.opacity05');
-				for (var i = 0; i < selectedItems.length; i++) {
-					var id = selectedItems[i].childNodes[0].childNodes[0].alt;
-					WTK.ItemFinder.itemsToFind = jQuery.grep(WTK.ItemFinder.itemsToFind, function(value) {
-						return value != id;
-					});
-				}
-				localStorage.setItem('WTKItemFinderItems', JSON.stringify(WTK.ItemFinder.itemsToFind));
-				WTK.ItemFinder.showItemFinder();
-            });
-            scrollPane.appendContent(itemInput.getMainDiv());
-            scrollPane.appendContent(addButton.getMainDiv());
-			scrollPane.appendContent(deleteButton.getMainDiv());
-			scrollPane.appendContent('<br>');
-			var itemIds = WTK.ItemFinder.itemsToFind;
-			for (var i = 0; i < itemIds.length; i++) {
-				var item = ItemManager.get(itemIds[i]);
-				var popup = new ItemPopup(item,{}).popup;
-				var div = $("<div>").append('<div class="item item_inventory hasMousePopup" title="' + popup.getXHTML().escapeHTML() + '"><img class="tw_item item_inventory_img dnd_draggable" src="' + item.image + '" alt='+itemIds[i]+'></div>');
-				div.find("img").off("click").click(function () {
-					$(this).parent().parent().toggleClass("opacity05");
-				});
-				scrollPane.appendContent(div);
-			}
-			var placeHolder = '';
-			for (var i = 0; i <= (itemIds.length - itemIds.length  % 11) / 11; i++) {
-				placeHolder += itemIds.length == 0 ? "<br/>" : "<br/><br/><br/><br/>";
-			}
-			scrollPane.appendContent(placeHolder);
-			$(WTK.GUI.window.getContentPane()).append(scrollPane.getMainDiv());
-		},
-	};
-	
+
 	WTK.FormattedRankings = {
 		init: function () {
 			RankingWindow.Cities.updateTable_backup = RankingWindow.Cities.updateTable;
@@ -804,7 +770,7 @@
 					$('.town_duel_points:not(div.cell.cell_6)')[i].innerText = format_number($('.town_duel_points:not(div.cell.cell_6)')[i].innerText);
 				}
 			};
-			
+
 			RankingWindow.Duels.updateTable_backup = RankingWindow.Duels.updateTable;
 			RankingWindow.Duels.updateTable = function (be_data) {
 				RankingWindow.Duels.updateTable_backup.call(this, be_data);
@@ -819,7 +785,7 @@
 					$('.duel_diff:not(div.cell.cell_5)')[i].innerText = format_number($('.duel_diff:not(div.cell.cell_5)')[i].innerText);
 				}
 			};
-			
+
 			RankingWindow.Experience.updateTable_backup = RankingWindow.Experience.updateTable;
 			RankingWindow.Experience.updateTable = function (be_data) {
 				RankingWindow.Experience.updateTable_backup.call(this, be_data);
@@ -831,7 +797,7 @@
 					}
 				}
 			};
-			
+
 			RankingWindow.FortBattles.updateTable_backup = RankingWindow.FortBattles.updateTable;
 			RankingWindow.FortBattles.updateTable = function (be_data) {
 				RankingWindow.FortBattles.updateTable_backup.call(this, be_data);
@@ -846,7 +812,7 @@
 					$('.forts_dodges:not(div.cell.cell_5)')[i].innerText = format_number($('.forts_dodges:not(div.cell.cell_5)')[i].innerText);
 				}
 			};
-			
+
 			RankingWindow.Crafting.updateTable_backup = RankingWindow.Crafting.updateTable;
 			RankingWindow.Crafting.updateTable = function (be_data) {
 				RankingWindow.Crafting.updateTable_backup.call(this, be_data);
@@ -858,7 +824,7 @@
 			};
 		},
 	};
-	
+
 	WTK.WindowPin = {
 		newPos: {left: -1, top: -1,},
 		saveMousPos: function (event) {
@@ -874,13 +840,13 @@
 			setTimeout((function () {
 				document.addEventListener("click", WTK.WindowPin.saveMousPos);
             }), 100);
-			
+
 		},
 		init: function () {
 			var tempPos = JSON.parse(localStorage.getItem('WTKPinPosition'));
 			if(tempPos != null && tempPos.left >= 0 && tempPos.top >= 0){
 				WTK.WindowPin.newPos = tempPos;
-			
+
 				Inventory.dock = function (dockedWindow) {
 					Inventory.window.center = function () {
 						var max_window_size_difference = 100;
@@ -943,10 +909,10 @@
 			}
 		},
 		setNewPos: function(){
-			
+
 		},
 	};
-	
+
 	WTK.ShowFort = {
 		init: function () {
 			ReportWindow.init_content_backup = ReportWindow.init_content;
@@ -955,11 +921,11 @@
 				if(data.reportType == 'fortbattle' && data.reportInfo.subtype == 'declare'){
 					WTK.ShowFort.getFortID(data.reportInfo.fortname, data.report_id);
 				}
-				
+
 			}
-			
+
 		},
-		
+
 		getFortID: function (fortName, report_id) {
 			Ajax.remoteCall('fort_overview', 'search_fort', {
 				fortNames: fortName
@@ -976,20 +942,19 @@
 			});
 		},
 	};
-	
+
 	WTK.BuildingProgress = {
 		init: function () {
 			BuildWindow.initInfo_backup = BuildWindow.initInfo;
 			BuildWindow.initInfo = function (data) {
-				console.log(data);
 				BuildWindow.initInfo_backup.call(this, data);
 				var tmp = $('<div class="rp_row_jobdata row_build_' + 'hammer' + '" title="' + WTKlang.progress.escapeHTML() + ':&nbsp;' + WTKlang.progressTooltip + '">' + '<span class="rp_jobdata_label_icon"><img src="https://westde.innogamescdn.com/images/icons/' + 'hammer' + '.png" alt="" /></span>' + '<span class="rp_jobdata_label text_bold">' + WTKlang.progress + '</span>' + '<span class="rp_jobdata_text text_bold"></span>' + '</div>');
 				$('span.rp_jobdata_text', tmp).append(new west.gui.Progressbar(data.build_point, data.build_point_limit).getMainDiv());
 				$('.build-'+data.x+'-'+data.y+'-'+ data.build_key +' div.build_info').append(tmp);
 			};
-		},	
+		},
 	};
-	
+
 	WTK.ImprovedBuildCityhall = {
 		init: function () {
 			CityhallWindow.Build.fillContent_backup = CityhallWindow.Build.fillContent;
@@ -1003,7 +968,7 @@
 						buildtext = r.name;
 						this.table.appendToCell(-1, "building_foreign", buildtext).appendToCell(-1, "stage", r.stage + " / " + (r.infinite ? "<img src='https://westde.innogamescdn.com/images/xp_inf_000.png' style='padding-bottom: 4px;'/>" : r.maxStage));
 					} else if (r.stage == r.maxStage && !r.infinite) {
-						
+
 					} else {
 						this.table.appendRow();
 						buildtext = '<a href="#" onClick="javascript:void(BuildWindow.open(' + Character.homeTown.town_id + ', ' + Character.homeTown.x + ', ' + Character.homeTown.y + ', \'' + r.key + '\', false));">' + r.name + '</a></span>';
@@ -1011,9 +976,274 @@
 					}
 				}
 			};
-		},	
+		},
 	};
-	
+
+	WTK.ExtendedItemFinder = {
+		itemsToFind: [],
+		searchResultDialog: null,
+		searchDialog: null,
+
+		init: function () {
+			var savedItemsToFindOriginal = JSON.parse(localStorage.getItem('WTKItemFinderItems'));
+			if(savedItemsToFindOriginal != null){
+				for (var i = 0; i < savedItemsToFindOriginal.length; i++) {
+					var item = {id: savedItemsToFindOriginal[i], targetAmount: 1, showNotification: true};
+					WTK.ExtendedItemFinder.itemsToFind.push(item);
+				}
+				localStorage.removeItem('WTKItemFinderItems');
+				localStorage.setItem('WTKExtendedItemFinderItems', JSON.stringify(WTK.ExtendedItemFinder.itemsToFind));
+			} else {
+				var savedItemsToFind = JSON.parse(localStorage.getItem('WTKExtendedItemFinderItems'));
+				if(savedItemsToFind != null){
+					WTK.ExtendedItemFinder.itemsToFind = savedItemsToFind;
+				}
+			}
+			WTK.ExtendedItemFinder.initFindNotification();
+		},
+
+		showExtendedItemFinder: function() {
+			WTK.GUI.open();
+			WTK.GUI.getDefault('WTKExtendedItemFinder');
+			var scrollPane = new west.gui.Scrollpane();
+
+			var itemSearchButton = new west.gui.Button(WTKlang.searchItem, function() {
+				WTK.ExtendedItemFinder.showSearchDialog();
+            });
+
+			var deleteButton = new west.gui.Button(WTKlang.deleteMarkedItems, function() {
+				WTK.ExtendedItemFinder.deleteSelectedItems();
+            }).addClass('inactive');
+
+			var helpButton = new west.gui.Button(WTKlang.help, function() {
+					WTK.ExtendedItemFinder.helpDialog = new west.gui.Dialog(WTKlang.help, $('<div>').append(WTKlang.itemFinderHelpContent)).addButton(WTKlang.back);
+					WTK.ExtendedItemFinder.helpDialog.show();
+            });
+			
+			scrollPane.appendContent(itemSearchButton.getMainDiv());
+            scrollPane.appendContent(deleteButton.getMainDiv());
+            scrollPane.appendContent(helpButton.getMainDiv());
+
+			var itemsToFind = WTK.ExtendedItemFinder.itemsToFind;
+			var targetAmount = 1;
+			for (var i = 0; i < itemsToFind.length; i++) {
+				var itemId = itemsToFind[i].id;
+				var item = ItemManager.get(itemId);
+				var popup = new ItemPopup(item,{}).popup;
+				var div;
+				var classToSet = '';
+				if(itemsToFind[i].showNotification == true) {
+					classToSet = 'WTK_find_notifcation_highlight'
+				}
+				if(Bag.getItemCount(itemId) >= itemsToFind[i].targetAmount){
+					div = $('<div>').append('<div class="item item_inventory hasMousePopup WTK_item_border_green" title="' + popup.getXHTML().escapeHTML() + '"><img class="tw_item item_inventory_img dnd_draggable" src="' + item.image + '" alt='+itemId+'>'+'<div class="' + classToSet + ' WTK_find_notifcation">'+ Bag.getItemCount(itemId) + ' / ' + itemsToFind[i].targetAmount +'</div>'+'<span class="count-required"><p/></span></div>');
+				} else {
+					div = $('<div>').append('<div class="item item_inventory hasMousePopup WTK_item_border" title="' + popup.getXHTML().escapeHTML() + '"><img class="tw_item item_inventory_img dnd_draggable" src="' + item.image + '" alt='+itemId+'>'+'<div class="' + classToSet + ' WTK_find_notifcation">' + Bag.getItemCount(itemId) + ' / ' + itemsToFind[i].targetAmount +'</div>'+'<span class="count-required"><p/></span></div>');
+				}
+				div.children("div").children("div").off("click").click(function () {
+					$(this).toggleClass("WTK_find_notifcation_highlight");
+					WTK.ExtendedItemFinder.toogleNotification($(this).parent().find("img").attr("alt"));
+				});
+				div.find("img").off("click").click(function () {
+					$(this).parent().parent().toggleClass("opacity05");
+					if($('.active_tab_id_WTKExtendedItemFinder').find('.opacity05').length == 0){
+						$('.WTKMenuWindow').find($('.tw2gui_button')).last().prev().addClass('inactive');
+					} else {
+						$('.WTKMenuWindow').find($('.tw2gui_button')).last().prev().removeClass('inactive');
+					}
+				});
+				scrollPane.appendContent(div);
+			}
+			var placeHolder = '';
+//			for (var i = 0; i <= (itemsToFind.length - itemsToFind.length  % 10) / 10; i++) {
+//				placeHolder += '<div style="height: 64px;" ondrop="WTK.ExtendedItemFinder.dropItem(event)" ondragover="WTK.ExtendedItemFinder.allowDrop(event)"/>';
+//			}
+			placeHolder = '<div style="height: ' + 66 * Math.ceil(itemsToFind.length / 10) + 'px;" />'
+
+			scrollPane.appendContent(placeHolder);
+			$(WTK.GUI.window.getContentPane()).append(scrollPane.getMainDiv());
+            $('.WTKMenuWindow').find($('.tw2gui_button')).first().css('margin-bottom', '5px')
+		},
+		
+		
+
+		deleteSelectedItems: function(){
+			var selectedItems = $('.active_tab_id_WTKExtendedItemFinder').find('.opacity05');
+			for (var i = 0; i < selectedItems.length; i++) {
+				var id = selectedItems[i].childNodes[0].childNodes[0].alt;
+				WTK.ExtendedItemFinder.itemsToFind = jQuery.grep(WTK.ExtendedItemFinder.itemsToFind, function(value) {
+					return value.id != id;
+				});
+			}
+			localStorage.setItem('WTKExtendedItemFinderItems', JSON.stringify(WTK.ExtendedItemFinder.itemsToFind));
+			WTK.ExtendedItemFinder.showExtendedItemFinder();
+		},
+
+		toogleNotification: function(item_id){
+			WTK.ExtendedItemFinder.itemsToFind
+			for (var i = 0; i < WTK.ExtendedItemFinder.itemsToFind.length; i++) {
+				var entry = WTK.ExtendedItemFinder.itemsToFind[i];
+				if (entry.id == item_id) {
+					entry.showNotification = ! entry.showNotification;
+					WTK.ExtendedItemFinder.itemsToFind[i] = entry;
+					localStorage.setItem('WTKExtendedItemFinderItems', JSON.stringify(WTK.ExtendedItemFinder.itemsToFind));
+				}
+			}
+		},
+
+		searchForItems: function(){
+			var name = $('#WTKExtendedItemFinder_searchDialog_name').val();
+			var amount = parseInt($('#WTKExtendedItemFinder_searchDialog_targetAmount').val());
+			var searchResult = [];
+			var searchMaximum = Math.floor(($( window ).height() - 230) / 16);
+			for(var oldItemId = 1; oldItemId < 253801 && searchResult.length < searchMaximum; oldItemId++){
+				var newItemId = oldItemId * 1000;
+				if(ItemManager.get(newItemId) != undefined && ItemManager.get(newItemId).name.toLowerCase().indexOf(name.toLowerCase()) >= 0 && WTK.ExtendedItemFinder.isAlreadyOnTheList(newItemId) == false){
+					searchResult.push(newItemId);
+				}
+			}
+			if(searchResult.length > 0){
+				var contentDiv = "";
+				for (var i = 0; i < searchResult.length; i++) {
+					var item_id = searchResult[i];
+					var item = ItemManager.get(item_id);
+					var popup = new ItemPopup(item,{}).popup;
+					contentDiv += '<a class="hasMousePopup" title="' + popup.getXHTML().escapeHTML() + '" href="javascript:void(WTK.ExtendedItemFinder.addItemToItemsToSearch(' + item_id + ',' + amount + '))">' + item.name + '</a> ' + WTK.ExtendedItemFinder.getColoredString(Bag.getItemCount(item.item_id), amount) + '<br>';
+				}
+				if(searchResult.length == searchMaximum){
+					contentDiv += '<br><b>' + WTKlang.thereAreMoreItems + '<br>' + WTKlang.restrictYourSearch + '</b>';
+				}
+				new west.gui.Dialog(WTKlang.searchResult, $(contentDiv)).addButton(WTKlang.back, function(){
+					WTK.ExtendedItemFinder.showSearchDialog(name, amount);
+				}).addButton('cancel').show();
+			} else {
+				MessageHint(WTKlang.emptySearchResult).show();
+			}
+		},
+
+		inputIsValid: function(){
+			var targetAmount = parseInt($('#WTKExtendedItemFinder_searchDialog_targetAmount').val());
+			var name = $('#WTKExtendedItemFinder_searchDialog_name').val();
+			if (name == undefined || name.length <= 0){
+				MessageError(WTKlang.nameCannotBeEmpty).show();
+				return false;
+			} else if (targetAmount == undefined || Number.isNaN(targetAmount) || targetAmount <= 0) {
+				MessageError(WTKlang.itemAmountMustBeHigherThan0).show();
+				return false;
+			}
+			return true;
+		},
+
+		addItemToItemsToSearch: function(item_id, targetAmountValue) {
+			if(WTK.ExtendedItemFinder.isAlreadyOnTheList(item_id) == false){
+				var item = {id: item_id, targetAmount: targetAmountValue, showNotification: false};
+				WTK.ExtendedItemFinder.itemsToFind.push(item);
+				localStorage.setItem('WTKExtendedItemFinderItems', JSON.stringify(WTK.ExtendedItemFinder.itemsToFind));
+				WTK.ExtendedItemFinder.showExtendedItemFinder();
+			}
+		},
+
+		showSearchDialog: function(nameInputValue, targetAmoundInputValue) {
+			var contentDiv = $('<div style="text-align: center;">');
+			contentDiv.append(WTKlang.whatItemsWouldYouLikeToSearchFor + '<br><b>' + WTKlang.nameOfTheItem + '<b>');
+			var nameInput = new west.gui.Textfield('WTKExtendedItemFinder_searchDialog_name').setSize(10).setClass4Input('input_layout');
+			nameInput.setValue(nameInputValue)
+			contentDiv.append(nameInput.getMainDiv());
+			contentDiv.append('<br>' + WTKlang.howManyOfThemWouldYouLikeToCollect + '<br><b>' + WTKlang.numberOfItems + '<b>');
+			var targetAmoundInput = new west.gui.Textfield('WTKExtendedItemFinder_searchDialog_targetAmount').onlyNumeric().setSize(10).setClass4Input('input_layout');
+			targetAmoundInput.setValue(targetAmoundInputValue);
+			contentDiv.append(targetAmoundInput.getMainDiv());
+			WTK.ExtendedItemFinder.searchDialog = new west.gui.Dialog(WTKlang.searchItem, $(contentDiv)).addButton(WTKlang.search, function () {
+				if(WTK.ExtendedItemFinder.inputIsValid()){
+					WTK.ExtendedItemFinder.searchForItems();
+				} else {
+					WTK.ExtendedItemFinder.showSearchDialog($('#WTKExtendedItemFinder_searchDialog_name').val(), $('#WTKExtendedItemFinder_searchDialog_targetAmount').val());
+				}
+			}).addButton('cancel');
+			WTK.ExtendedItemFinder.searchDialog.show();
+			$('#WTKExtendedItemFinder_searchDialog_name').focus()
+			$('#WTKExtendedItemFinder_searchDialog_targetAmount').val(1);
+		},
+
+		isAlreadyOnTheList: function(item_id) {
+			for(var i = 0; i < WTK.ExtendedItemFinder.itemsToFind.length; i++){
+				if(WTK.ExtendedItemFinder.itemsToFind[i].id == item_id){
+					return true;
+				}
+			}
+			return false;
+		},
+
+		getColoredString: function(currentAmount, targetAmount) {
+			var color = targetAmount > currentAmount ? 'red' : 'green';
+			return '<span class="text_' + color + ' bold">' + currentAmount + '/' + targetAmount + '</span>';
+		},
+		
+		initFindNotification: function() {
+			Bag.handleChanges_backup = Bag.handleChanges;
+			Bag.handleChanges = function (changes, from) {
+				var i = 0, l = changes.length, item;
+				for (i; i < l; i++) {
+					if (changes[i].count > 0 && WTK.ExtendedItemFinder.isAlreadyOnTheList(changes[i].item_id) && from != 'wear') {
+						var item2 = ItemManager.get(changes[i].item_id);
+						var popup = new ItemPopup(item2,{}).popup;
+						new west.gui.Dialog(WTKlang.itemFinder, '<div class="item item_inventory hasMousePopup" title="' + popup.getXHTML().escapeHTML() + '"><img class="tw_item item_inventory_img dnd_draggable" src="' + item2.image + '"></div>' + WTKlang.youHaveFound + '<br><br><div style="text-align: center;"><b>' + item2.name +'</b></div><br>').addButton('ok').setModal(true, false, {
+							bg : "https://westde.innogamescdn.com/images/curtain_bg.png", opacity : 0.7
+						}).setHeight('40px').show();
+					}
+				}
+				Bag.handleChanges_backup.call(this, changes, from);
+			}
+		},
+		
+		isItemOnNotificationList: function(item_id) {
+			for(var i = 0; i < WTK.ExtendedItemFinder.itemsToFind.length; i++){
+				if(WTK.ExtendedItemFinder.itemsToFind[i].id == item_id && WTK.ExtendedItemFinder.itemsToFind[i].showNotification == true){
+					return true;
+				}
+			}
+			return false;
+		}
+	};
+
+	WTK.ExtendedBBCodes = {
+		init: function () {
+			Game.TextHandler.parse_backup = Game.TextHandler.parse;
+			Game.TextHandler.parse = function (text) {
+				var text = WTK.ExtendedBBCodes.replaceColor(text);
+				text = WTK.ExtendedBBCodes.replaceSize(text);
+				text = WTK.ExtendedBBCodes.replaceImage(text);
+				return Game.TextHandler.parse_backup.call(this, text);
+			}
+		},
+		
+		replaceColor: function (text) {
+			var resultArray = text.match(/\[color=[a-z]*\]/g);
+			if (resultArray != null) {
+				for (var i = 0; i <resultArray.length; i++) {
+					var color = resultArray[i].replace('[color=','').replace(']','');
+					text = text.replace(/\[color=[a-z]*\]/,'<span style="color:' + color + '">').replace(/\[\/color\]/,'</span>');
+				}
+			}
+			return text;
+		},
+		
+		replaceSize: function (text) {
+			var resultArray = text.match(/\[size=[0-9]*\]/g);
+			if (resultArray != null) {
+				for (var i = 0; i <resultArray.length; i++) {
+					var size = resultArray[i].replace('[size=','').replace(']','');
+					text = text.replace(/\[size=[0-9]*\]/,'<span style="font-size:' + size + 'px">').replace(/\[\/size\]/,'</span>');
+				}
+			}
+			return text;
+		},
+		
+		replaceImage: function (text) {
+			return text.replace(/\[img\]/g,'<img src="').replace(/\[\/img\]/g,'"/>');
+		},
+	};
+
 	WTK.Updater = function () {
       $.getScript(WTK.updateUrl, function () {
         if (scriptUpdate.WTK > WTK.version) {
@@ -1025,6 +1255,6 @@
       });
     };
     setTimeout(WTK.Updater, 4000);
-	
+
 	WTK.Skript.init();
 });
