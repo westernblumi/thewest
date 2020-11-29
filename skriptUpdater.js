@@ -1,6 +1,6 @@
 var scriptUpdate={
-	TWFBT:'1.16',
-	TWFBTNew:'Bug fixes',
+	TWFBT:'1.17',
+	TWFBTNew:'-item bonus fixed<br>-code improvements',
 	announcementBlock: '1.02',
 	announcementBlockNew: 'Support for other language servers',
 	WTK: '1.08',
